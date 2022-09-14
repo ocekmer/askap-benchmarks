@@ -137,25 +137,40 @@ int main()
     tFin = omp_get_wtime();
     auto timeGridCPU = (tFin - tInit) * 1000.0; // in ms
 
-    // Gridding on GPU
+    auto timeGridGPU = 0.0 , max = 0.0, min = 0.0;
+
     GridderGPU<Value> gridderGPU(support, GSIZE, data, C, cOffset, iu, iv, gpuGrid);
-    tInit = omp_get_wtime();
-    gridderGPU.gridder();
-    tFin = omp_get_wtime();
-    auto timeGridGPU = (tFin - tInit) * 1000.0; // in ms
-    
-    cout << "Verify the code" << endl;
-    maximumError.maxError(cpuGrid, gpuGrid);
+    for (int i = 0; i < 10; i++) {
+        // Gridding on GPU
+        tInit = omp_get_wtime();
+        gridderGPU.gridder();
+        tFin = omp_get_wtime();
+        timeGridGPU = (tFin - tInit) * 1000.0; // in ms
+
+        if (timeGridGPU > max) {
+            max = timeGridGPU;
+            if (i == 0) {
+                min = max;
+            }
+        }
+        if (timeGridGPU < min) {
+            min = timeGridGPU;
+        }
+    }
 
     cout << "\nRUNTIME IN MILLISECONDS:" << endl;
     cout << left << setw(21) << "Setup"
         << left << setw(21) << "Gridding CPU"
         << left << setw(21) << "Gridding GPU"
-        << left << setw(21) << "Speedup" << endl;;
+        << left << setw(21) << "Warmup Min"
+        << left << setw(21) << "Warmup Max"
+        << left << setw(21) << "Speedup" << endl;
 
     cout << setprecision(2) << fixed;
     cout << left << setw(21) << timeSetup
         << left << setw(21) << timeGridCPU
-        << left << setw(21) << timeGridGPU 
-        << left << setw(21) << timeGridCPU/timeGridGPU << endl;
+        << left << setw(21) << timeGridGPU
+        << left << setw(21) << min
+        << left << setw(21) << max
+        << left << setw(21) << timeGridCPU/timeGridGPU << endl;    
 }

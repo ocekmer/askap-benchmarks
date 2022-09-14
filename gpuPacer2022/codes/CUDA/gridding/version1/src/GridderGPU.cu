@@ -1,6 +1,5 @@
 #include "GridderGPU.h"
 
-using std::cout;
 using std::endl;
 using std::vector;
 using std::complex;
@@ -23,7 +22,6 @@ int gridStep(const int DSIZE, const int SSIZE, const int dind, const std::vector
 template <typename T2>
 void GridderGPU<T2>::gridder()
 {
-    cout << "\nGridding on GPU" << endl;
 
     // Timing
     cudaEvent_t start, stop;
@@ -66,7 +64,6 @@ void GridderGPU<T2>::gridder()
     /*******************************************************************************************************/
     /*******************************************************************************************************/
     // Kernel launch
-    cout << "Kernel launch" << endl;
     const size_t DSIZE = data.size();
     typedef cuComplex Complex;
     cudaFuncSetCacheConfig(devGridKernel, cudaFuncCachePreferL1);
@@ -90,13 +87,11 @@ void GridderGPU<T2>::gridder()
     for (int dind = 0; dind < DSIZE; dind += step)
     {
         step = gridStep(DSIZE, SSIZE, dind, iu, iv);
-//        cout << "Step = " << step << endl;
         dim3 gridDim(SSIZE, step);
         devGridKernel << <gridDim, SSIZE >> > ((const Complex*)dData, support, (const Complex*)dC, dCOffset, dIU, dIV, (Complex*)dGrid, GSIZE, dind);
         cudaCheckErrors("kernel launch (devGridKernel_v0) failure");
         count++;
     }
-    cout << "Used " << count << " kernel launches." << endl;
 
     cudaMemcpy(gpuGrid.data(), dGrid, SIZE_GRID, cudaMemcpyDeviceToHost);
     cudaCheckErrors("cudaMemcpy D2H failure");

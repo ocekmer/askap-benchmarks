@@ -10,7 +10,7 @@ int gridStep(const int DSIZE, const int SSIZE, const int dind, const std::vector
 template <typename T2>
 void GridderGPU<T2>::gridder()
 {
-    cout << "\nGridding on GPU" << endl;
+    //out << "\nGridding on GPU" << endl;
 
     // Device parameters
     const size_t SIZE_DATA = data.size() * sizeof(T2);
@@ -47,7 +47,7 @@ void GridderGPU<T2>::gridder()
     /*******************************************************************************************************/
     /*******************************************************************************************************/
     // Kernel launch
-    cout << "Kernel launch" << endl;
+    //cout << "Kernel launch" << endl;
     const size_t DSIZE = data.size();
     typedef hipComplex Complex;
     hipFuncSetCacheConfig(reinterpret_cast<const void*>(devGridKernel), hipFuncCachePreferL1);
@@ -77,7 +77,7 @@ void GridderGPU<T2>::gridder()
         gpuCheckErrors("kernel launch (devGridKernel_v0) failure");
         count++;
     }
-    cout << "Used " << count << " kernel launches." << endl;
+    //cout << "Used " << count << " kernel launches." << endl;
 
     gpuErrchk(hipMemcpy(gpuGrid.data(), dGrid, SIZE_GRID, hipMemcpyDeviceToHost));
     gpuCheckErrors("hipMemcpy D2H failure");

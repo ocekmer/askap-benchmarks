@@ -1,6 +1,5 @@
 #include "DegridderGPU.h"
 
-using std::cout;
 using std::endl;
 using std::vector;
 using std::complex;
@@ -56,14 +55,12 @@ void degridHelper(const Complex* dGrid,
         }
         cudaCheckErrors("cuda kernel launch failure");
     }
-    cout << "Used " << count << " kernel launches." << endl;
 
 }
 
 template <typename T2>
 void DegridderGPU<T2>::degridder()
 {
-    cout << "\nDegridding on GPU" << endl;
 
     // Device parameters
     const size_t SIZE_DATA = data.size() * sizeof(T2);

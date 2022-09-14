@@ -137,30 +137,46 @@ int main()
     degridderCPU.cpuKernel();
     tFin = omp_get_wtime();
     auto timeDegridCPU = (tFin - tInit) * 1000.0; // in ms
-
-    // Degridding on GPU
+   
+    auto timeDegridGPU = 0.0, max = 0.0, min = 0.0;
+ 
     DegridderGPU<Value> degridderGPU(gpuGrid, SSIZE, DSIZE, GSIZE, support, C, cOffset, iu, iv, gpuOutData);
-    tInit = omp_get_wtime();
-    degridderGPU.degridder();
-    tFin = omp_get_wtime();
-    auto timeDegridGPU = (tFin - tInit) * 1000.0; // in ms
+    for (int i = 0; i < 10; i++) {
+    // Degridding on GPU
+        tInit = omp_get_wtime();
+        degridderGPU.degridder();
+        tFin = omp_get_wtime();
+        timeDegridGPU = (tFin - tInit) * 1000.0; // in ms
     
+        if (timeDegridGPU > max) {
+            max = timeDegridGPU;
+            if (i == 0) {
+                min = max;
+            }
+        }
+        if (timeDegridGPU < min) {
+            min = timeDegridGPU;
+        }
+    }
+ 
     //printVectorComplex.printVector(cpuOutData);
     //printVectorComplex.printVector(gpuOutData);
-
-    cout << "Verify the code" << endl;
-    maximumError.maxError(cpuOutData, gpuOutData);
-    
     cout << "\nRUNTIME IN MILLISECONDS:" << endl;
     cout << left << setw(21) << "Setup"
-        << left << setw(21) << "Gridding CPU"
-        << left << setw(21) << "Gridding GPU"
-        << left << setw(21) << "Speedup" << endl;;
+        << left << setw(21) << "Degridding CPU"
+        << left << setw(21) << "Degridding GPU"
+        << left << setw(21) << "Warmup Min"
+        << left << setw(21) << "Warmup Max"
+        << left << setw(21) << "Speedup" << endl;
 
     cout << setprecision(2) << fixed;
     cout << left << setw(21) << timeSetup
         << left << setw(21) << timeDegridCPU
-        << left << setw(21) << timeDegridGPU 
+        << left << setw(21) << timeDegridGPU
+        << left << setw(21) << min
+        << left << setw(21) << max
         << left << setw(21) << timeDegridCPU/timeDegridGPU << endl;
-        
+
+       
+ 
 }
