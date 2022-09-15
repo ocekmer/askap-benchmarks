@@ -56,6 +56,7 @@
 #include "src/CommonGPU.h"
 #include "src/GridderCPU.h"
 #include "src/GridderGPU.h"
+#include "src/WarmupGPU.h"
 
 #include <iostream>
 #include <complex>
@@ -134,6 +135,12 @@ int main()
     // printVector.printVector(u);
     // printVector.printVector(v);
     // printVector.printVector(w);
+    auto timeWarmup = 0.0;
+
+    tInit = omp_get_wtime();
+    warmup(1);
+    tFin = omp_get_wtime();
+    timeWarmup = (tFin - tInit) * 1000.0;
 
     // Gridding on CPU
     GridderCPU<Value> gridderCPU(support, GSIZE, data, C, cOffset, iu, iv, cpuGrid);
@@ -171,14 +178,16 @@ int main()
     cout << left << setw(21) << "Setup"
         << left << setw(21) << "Gridding CPU"
         << left << setw(21) << "Gridding GPU"
-        << left << setw(21) << "Warmup Min" 
-        << left << setw(21) << "Warmup Max" 
+        << left << setw(21) << "Warmup Kernel"
+        << left << setw(21) << "Warmed Min"
+        << left << setw(21) << "Warmed Max"
         << left << setw(21) << "Speedup" << endl;
 
     cout << setprecision(2) << fixed;
     cout << left << setw(21) << timeSetup
         << left << setw(21) << timeGridCPU
-        << left << setw(21) << timeGridGPU 
+        << left << setw(21) << timeGridGPU
+        << left << setw(21) << timeWarmup
         << left << setw(21) << min 
         << left << setw(21) << max 
         << left << setw(21) << timeGridCPU/timeGridGPU << endl;
