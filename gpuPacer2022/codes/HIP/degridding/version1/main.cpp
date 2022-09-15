@@ -54,6 +54,7 @@
 #include "src/Setup.h"
 #include "src/DegridderCPU.h"
 #include "src/DegridderGPU.h"
+#include "src/WarmupGPU.h"
 
 #include <iostream>
 #include <complex>
@@ -129,6 +130,8 @@ int main()
     // printVector.printVector(u);
     // printVector.printVector(v);
     // printVector.printVector(w);
+    
+    warmup(10);
 
     // Degridding on CPU
     const size_t DSIZE = data.size();
@@ -141,7 +144,7 @@ int main()
     auto timeDegridGPU = 0.0, max = 0.0, min = 0.0;
  
     DegridderGPU<Value> degridderGPU(gpuGrid, SSIZE, DSIZE, GSIZE, support, C, cOffset, iu, iv, gpuOutData);
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 1; i++) {
     // Degridding on GPU
         tInit = omp_get_wtime();
         degridderGPU.degridder();

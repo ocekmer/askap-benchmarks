@@ -12,7 +12,8 @@ obj/Setup.o \
 obj/MaxError.o \
 obj/PrintVector.o \
 obj/RandomVectorGenerator.o \
-obj/RunInfo.o
+obj/RunInfo.o \
+obj/WarmupGPU.o
 
 all : $(EXE)
 
