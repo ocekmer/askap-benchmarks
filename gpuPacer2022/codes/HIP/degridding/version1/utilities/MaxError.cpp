@@ -27,7 +27,7 @@ void MaxError<complex<float>>::maxError(const std::vector<complex<float>>& v1, c
                 maximumErrorReal = abs(v1[i].real() - v2[i].real());
                 index = i;
                 cout << "Maximum Error: (" << maximumErrorReal << ", " << maximumErrorImag << "), at index: " << index << endl;
-                exit(-1);
+                //exit(-1);
             }
         }
         cout << "Maximum Error: (" << maximumErrorReal << ", " << maximumErrorImag << ")" << endl;

@@ -1,7 +1,7 @@
 #include "gridKernelGPU.h"
 
 __global__
-void devGridKernel(
+void devGridKernel1(
     const Complex* data,
     const int support,
     const Complex* C,
@@ -47,4 +47,64 @@ void devGridKernel(
 
     // threadIdx.x gives the support location in the u direction
     grid[gind + threadIdx.x] = hipCfmaf(dataLocal, C[cind + threadIdx.x], grid[gind + threadIdx.x]);
+}
+
+__global__
+void devGridKernel2(
+    const Complex* data,
+    const int support,
+    const Complex* C,
+    const int* cOffset,
+    const int* iu,
+    const int* iv,
+    Complex* grid,
+    const int GSIZE,
+    const int dind)
+{
+
+    const int bind = blockIdx.x;
+    const int tind = threadIdx.x;
+
+    const int dindLocal = dind + bind;
+
+    const int SSIZE = 2 * support + 1;
+    assert(SSIZE == blockDim.x);
+
+    // The actual starting grid point
+    __shared__ int gindShared;
+
+    // The Convolution function point from which we offset
+    __shared__ int cindShared;
+
+    __shared__ Complex dataLocal;
+
+    if (tind == 0)
+    {
+        gindShared = iu[dindLocal] + GSIZE * iv[dindLocal] - support;
+        cindShared = cOffset[dindLocal];
+        dataLocal = data[dindLocal];
+    }
+    __syncthreads();
+
+    for (int row = 0; row < SSIZE; ++row)
+    {
+        // Make a local copy from shared memory
+        int gind = gindShared + GSIZE * row;
+        int cind = cindShared + SSIZE * row;
+
+        if (tind < SSIZE)
+        {
+            //grid[gind + tind] = hipCfmaf(dataLocal, C[cind + tind], grid[gind + tind]);
+            const Complex tmp = hipCmulf(dataLocal, C[cind + tind]);
+            //grid[gind + tind] = hipCaddf(grid[gind + tind], tmp);
+            //atomicAdd(&grid[gind + tind].x, tmp.x);
+            //atomicAdd(&grid[gind + tind].y, tmp.y);
+            atomicAdd(&grid[gind].x+2*tind,   tmp.x);
+            atomicAdd(&grid[gind].x+2*tind+1, tmp.y);
+            //unsafeAtomicAdd(&grid[gind + tind].x, tmp.x);
+            //unsafeAtomicAdd(&grid[gind + tind].y, tmp.y);
+        }
+
+    }
+
 }

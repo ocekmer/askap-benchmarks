@@ -123,8 +123,10 @@ int main()
     const int SSIZE = 2 * support + 1;
     vector<Value> cpuGrid(GSIZE * GSIZE);
     cpuGrid.assign(cpuGrid.size(), static_cast<Value>(1.0));
+    //cpuGrid.assign(cpuGrid.size(), Value(1.0,1.0));
     vector<Value> gpuGrid(GSIZE * GSIZE);
     gpuGrid.assign(gpuGrid.size(), static_cast<Value>(1.0));
+    //gpuGrid.assign(gpuGrid.size(), Value(1.0,1.0));
 
     // printVector.printVector(u);
     // printVector.printVector(v);
