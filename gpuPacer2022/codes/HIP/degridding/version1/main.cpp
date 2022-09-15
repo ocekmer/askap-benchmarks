@@ -130,8 +130,12 @@ int main()
     // printVector.printVector(u);
     // printVector.printVector(v);
     // printVector.printVector(w);
-    
-    warmup(10);
+    auto timeWarmup = 0.0;    
+
+    tInit = omp_get_wtime();
+    warmup(1);
+    tFin = omp_get_wtime();
+    timeWarmup = (tFin - tInit) * 1000.0;
 
     // Degridding on CPU
     const size_t DSIZE = data.size();
@@ -144,7 +148,7 @@ int main()
     auto timeDegridGPU = 0.0, max = 0.0, min = 0.0;
  
     DegridderGPU<Value> degridderGPU(gpuGrid, SSIZE, DSIZE, GSIZE, support, C, cOffset, iu, iv, gpuOutData);
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 2; i++) {
     // Degridding on GPU
         tInit = omp_get_wtime();
         degridderGPU.degridder();
@@ -168,14 +172,16 @@ int main()
     cout << left << setw(21) << "Setup"
         << left << setw(21) << "Degridding CPU"
         << left << setw(21) << "Degridding GPU"
-        << left << setw(21) << "Warmup Min"
-        << left << setw(21) << "Warmup Max"
+        << left << setw(21) << "Warmup Kernel"
+        << left << setw(21) << "Warmed Min"
+        << left << setw(21) << "Warmed Max"
         << left << setw(21) << "Speedup" << endl;
 
     cout << setprecision(2) << fixed;
     cout << left << setw(21) << timeSetup
         << left << setw(21) << timeDegridCPU
         << left << setw(21) << timeDegridGPU
+        << left << setw(21) << timeWarmup
         << left << setw(21) << min
         << left << setw(21) << max
         << left << setw(21) << timeDegridCPU/timeDegridGPU << endl;
