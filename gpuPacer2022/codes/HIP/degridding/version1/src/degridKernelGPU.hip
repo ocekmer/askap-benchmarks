@@ -1,13 +1,15 @@
 #include "degridKernelGPU.h"
 #include <cassert>
 
-// launch_bounds__(2*support+1, 8)
-template <int support>
+// need a max size for the static shared memory vectors. Note that there are two of them.
+#define MAX_SSIZE 256
+
 __global__
 void devDegridKernel(
     const Complex* grid,
     const int GSIZE,
     const Complex* C,
+    const int support,
     const int* cOffset,
     const int* iu,
     const int* iv,
@@ -30,8 +32,8 @@ void devDegridKernel(
     __shared__ int cindShared;
 
     // Shared memory buffer for the conv pixels in this block (data point)
-    __shared__ float sdata_re[SSIZE];
-    __shared__ float sdata_im[SSIZE];
+    __shared__ float sdata_re[MAX_SSIZE];
+    __shared__ float sdata_im[MAX_SSIZE];
 
     if (tind == 0)
     {
@@ -54,28 +56,6 @@ void devDegridKernel(
             sdata_re[tind] = cpix.x;
             sdata_im[tind] = cpix.y;
             __syncthreads();
-
-            //DegridderGPU IN MILLISECONDS:
-            //hipMallocs           hipMemcpys (H2D)     kernel               total      original
-            //61.56                313.01               0.71                 422.21
-            //61.02                309.89               0.71                 418.36
-            //59.86                309.99               0.71                 418.27
-            //hipMallocs           hipMemcpys (H2D)     kernel               total      Reduction #1
-            //61.34                309.72               0.60                 416.65
-            //61.66                313.83               0.58                 419.82
-            //59.78                311.65               0.59                 417.04
-            //hipMallocs           hipMemcpys (H2D)     kernel               total      Reduction #2
-            //62.09                312.88               0.60                 421.94
-            //59.86                310.96               0.61                 416.64
-            //60.77                310.60               0.60                 418.89
-            //hipMallocs           hipMemcpys (H2D)     kernel               total      Reduction #3
-            //61.74                311.09               0.61                 421.11
-            //61.12                310.37               0.61                 419.66
-            //60.92                313.63               0.59                 421.76
-            //hipMallocs           hipMemcpys (H2D)     kernel               total      Reduction #4
-            //60.97                311.78               0.60                 417.27
-            //61.43                314.90               0.59                 421.45
-            //61.10                316.58               0.61                 424.42
 
             // Reduction suggestions at https://developer.download.nvidia.com/assets/cuda/files/reduction.pdf
 
@@ -173,16 +153,4 @@ void devDegridKernel(
     }
 
 }
-
-template
-__global__
-void devDegridKernel<64>(
-    const Complex* grid,
-    const int GSIZE,
-    const Complex* C,
-    const int* cOffset,
-    const int* iu,
-    const int* iv,
-    Complex* data,
-    const int dind);
 

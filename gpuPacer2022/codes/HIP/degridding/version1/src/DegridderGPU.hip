@@ -28,26 +28,23 @@ void degridHelper(const Complex* dGrid,
     hipDeviceProp_t devProp;
     hipGetDeviceProperties(&devProp, device);
 
+    cout << "maxGridSize "<<devProp.maxGridSize<<" maxThreadsPerBlock = "<<devProp.maxThreadsPerBlock << endl;
+    int gridSize = devProp.maxGridSize[0];  // launch kernels for this number of samples at a time
+    assert(SSIZE <= devProp.maxThreadsPerBlock);
+
     int count = 0;
-    int gridSize = 1024 * devProp.multiProcessorCount; // is starting size, will be reduced as required
     for (int dind = 0; dind < DSIZE; dind += gridSize)
     {
-        // if there are less than dimGrid elements left,
-        // do the remaining
+        // if there are less than dimGrid elements left, do the remaining
         if ((DSIZE - dind) < gridSize)
         {
             gridSize = DSIZE - dind;
         }
 
         ++count;
-        switch (support)
-        {
-        case 64:
-            devDegridKernel<64> <<< gridSize, SSIZE >>>(dGrid, GSIZE, dC, dCOffset, dIU, dIV, dData, dind);
-            break;
-        default:
-            assert(0);
-        }
+
+        devDegridKernel <<< gridSize, SSIZE >>>(dGrid, GSIZE, dC, support, dCOffset, dIU, dIV, dData, dind);
+
         gpuCheckErrors("cuda kernel launch failure");
     }
     cout << "Used " << count << " kernel launches." << endl;
@@ -101,7 +98,7 @@ void DegridderGPU<T2>::degridder()
 
     gpuErrchk(hipMemcpy(data.data(), dData, SIZE_DATA, hipMemcpyDeviceToHost));
     gpuCheckErrors("hipMemcpy D2H failure");
-
+    auto tD2H = omp_get_wtime();
 
     // Deallocate device vectors
     gpuErrchk(hipFree(dData));
@@ -111,18 +108,23 @@ void DegridderGPU<T2>::degridder()
     gpuErrchk(hipFree(dIU));
     gpuErrchk(hipFree(dIV));
     gpuCheckErrors("hipFree failure");
+    auto tFrees = omp_get_wtime();
     auto tFinal = omp_get_wtime();
 
     cout << "\nDegridderGPU IN MILLISECONDS:" << endl;
     cout << left << setw(21) << "hipMallocs"
          << left << setw(21) << "hipMemcpys (H2D)"
          << left << setw(21) << "kernel"
+         << left << setw(21) << "hipMemcpys (D2H)"
+         << left << setw(21) << "frees"
          << left << setw(21) << "total" << endl;;
 
     //cout << setprecision(2) << fixed;
     cout << left << setw(21) << (tAlloc - tInit) * 1000.0
          << left << setw(21) << (tH2D - tAlloc) * 1000.0
          << left << setw(21) << (tKernel - tH2D) * 1000.0 
+         << left << setw(21) << (tD2H - tKernel) * 1000.0
+         << left << setw(21) << (tFrees - tD2H) * 1000.0
          << left << setw(21) << (tFinal - tInit) * 1000.0 << endl;
 
 }

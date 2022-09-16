@@ -75,18 +75,6 @@ void GridderGPU<T2>::gridder()
     so subsequent calls to gridStep() overlap with the actual gridding.
     */
 
-    /*
-hipMallocs           hipMemcpys (H2D)     kernel               total    kernel = 1
-0.42                 306.52               170.12               498.91
-0.42                 547.06               173.82               746.23
-0.41                 307.65               168.72               499.25
-hipMallocs           hipMemcpys (H2D)     kernel               total    kernel = 2
-0.41                 307.09               0.71                 418.19
-0.41                 309.07               0.60                 418.99
-0.40                 305.27               0.67                 415.78
-    */
-
-
     const int kernel = 2;
 
     if (kernel == 1) {
@@ -99,7 +87,8 @@ hipMallocs           hipMemcpys (H2D)     kernel               total    kernel =
             step = gridStep(DSIZE, SSIZE, dind, iu, iv);
             dim3 gridDim(SSIZE, step);
             /// PJE: make sure any chevron is tightly packed
-            devGridKernel1 <<<gridDim, SSIZE >>>((const Complex*)dData, support, (const Complex*)dC, dCOffset, dIU, dIV, (Complex*)dGrid, GSIZE, dind);
+            devGridKernel1 <<<gridDim, SSIZE >>>((const Complex*)dData, support, (const Complex*)dC,
+                                                 dCOffset, dIU, dIV, (Complex*)dGrid, GSIZE, dind);
             gpuCheckErrors("kernel launch (devGridKernel_v0) failure");
             count++;
         }
@@ -114,26 +103,23 @@ hipMallocs           hipMemcpys (H2D)     kernel               total    kernel =
         hipDeviceProp_t devProp;
         hipGetDeviceProperties(&devProp, device);
  
+        int gridSize = devProp.maxGridSize[0];  // launch kernels for this number of samples at a time
+        assert(SSIZE <= devProp.maxThreadsPerBlock);
+
         int count = 0;
-        int gridSize = 1024 * devProp.multiProcessorCount; // is starting size, will be reduced as required
         for (int dind = 0; dind < DSIZE; dind += gridSize)
         {
-            // if there are less than dimGrid elements left,
-            // do the remaining
+            // if there are less than dimGrid elements left, do the remaining
             if ((DSIZE - dind) < gridSize)
             {
                 gridSize = DSIZE - dind;
             }
  
             ++count;
-            switch (support)
-            {
-            case 64:
-                devGridKernel2 <<< gridSize, SSIZE >>>((const Complex*)dData, support, (const Complex*)dC, dCOffset, dIU, dIV, (Complex*)dGrid, GSIZE, dind);
-                break;
-            default:
-                assert(0);
-            }
+
+            devGridKernel2 <<< gridSize, SSIZE >>>((const Complex*)dData, support, (const Complex*)dC,
+                                                   dCOffset, dIU, dIV, (Complex*)dGrid, GSIZE, dind);
+
             gpuCheckErrors("cuda kernel launch failure");
         }
         cout << "Used " << count << " kernel launches." << endl;
