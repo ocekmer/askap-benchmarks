@@ -29,7 +29,7 @@ void degridHelper(const Complex* dGrid,
     hipGetDeviceProperties(&devProp, device);
 
     cout << "maxGridSize "<<devProp.maxGridSize<<" maxThreadsPerBlock = "<<devProp.maxThreadsPerBlock << endl;
-    int gridSize = devProp.maxGridSize[0];  // launch kernels for this number of samples at a time
+    int gridSize = devProp.maxGridSize[0]/(SSIZE+1);  // launch kernels for this number of samples at a time
     assert(SSIZE <= devProp.maxThreadsPerBlock);
 
     int count = 0;
