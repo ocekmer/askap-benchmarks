@@ -1,13 +1,12 @@
 #include "GridderGPU.h"
 
-#include <omp.h>
 #include <iomanip>
+
 using std::cout;
 using std::endl;
 using std::vector;
 using std::complex;
 using std::left;
-using std::setprecision;
 using std::setw;
 using std::fixed;
 
@@ -17,7 +16,15 @@ template <typename T2>
 void GridderGPU<T2>::gridder()
 {
     cout << "\nGridding on GPU" << endl;
-    auto tInit = omp_get_wtime();
+
+    hipEvent_t start, stop;
+    hipEventCreate(&start);
+    hipEventCreate(&stop);
+    float tAlloc{ 0.0 }; // in milliseconds
+    float tH2D{ 0.0 }; // in milliseconds
+    float tKernel{ 0.0 }; // in milliseconds
+    float tD2H{ 0.0 }; // in milliseconds
+    float tFrees{ 0.0 }; // in milliseconds
 
     // Device parameters
     const size_t SIZE_DATA = data.size() * sizeof(T2);
@@ -35,6 +42,8 @@ void GridderGPU<T2>::gridder()
     int* dIV;
 
     // Allocate device vectors
+    hipEventRecord(start);
+    hipEventSynchronize(start);
     gpuErrchk(hipMalloc(&dData, SIZE_DATA));
     gpuErrchk(hipMalloc(&dGrid, SIZE_GRID));
     gpuErrchk(hipMalloc(&dC, SIZE_C));
@@ -42,8 +51,12 @@ void GridderGPU<T2>::gridder()
     gpuErrchk(hipMalloc(&dIU, SIZE_IU));
     gpuErrchk(hipMalloc(&dIV, SIZE_IV));
     gpuCheckErrors("hipMalloc failure");
-    auto tAlloc = omp_get_wtime();
+    hipEventRecord(stop);
+    hipEventSynchronize(stop);
+    hipEventElapsedTime(&tAlloc, start, stop);
 
+    hipEventRecord(start);
+    hipEventSynchronize(start);
     gpuErrchk(hipMemcpy(dData, data.data(), SIZE_DATA, hipMemcpyHostToDevice));
     gpuErrchk(hipMemcpy(dGrid, gpuGrid.data(), SIZE_GRID, hipMemcpyHostToDevice));
     gpuErrchk(hipMemcpy(dC, C.data(), SIZE_C, hipMemcpyHostToDevice));
@@ -51,7 +64,9 @@ void GridderGPU<T2>::gridder()
     gpuErrchk(hipMemcpy(dIU, iu.data(), SIZE_IU, hipMemcpyHostToDevice));
     gpuErrchk(hipMemcpy(dIV, iv.data(), SIZE_IV, hipMemcpyHostToDevice));
     gpuCheckErrors("hipMemcpy H2D failure");
-    auto tH2D = omp_get_wtime();
+    hipEventRecord(stop);
+    hipEventSynchronize(stop);
+    hipEventElapsedTime(&tH2D, start, stop);
 
     /*******************************************************************************************************/
     /*******************************************************************************************************/
@@ -61,25 +76,29 @@ void GridderGPU<T2>::gridder()
     typedef hipComplex Complex;
 
     const int SSIZE = 2 * support + 1;
-    int step = 1;
 
-    /*
-    This loop steps through each spectral sample
-    either 1 or 2 at a time. It will do multiple samples
-    if the regions involved do not overlap. If they do,
-    only the non-overlapping samples are gridded.
-
-    Gridding multiple points is better, because giving the
-    GPU more work to do allows it to hide memory latency
-    better. The call to d_gridKernel() is asynchronous
-    so subsequent calls to gridStep() overlap with the actual gridding.
-    */
+    hipEventRecord(start);
+    hipEventSynchronize(start);
 
     const int kernel = 2;
 
     if (kernel == 1) {
 
+        /*
+        This loop steps through each spectral sample
+        either 1 or 2 at a time. It will do multiple samples
+        if the regions involved do not overlap. If they do,
+        only the non-overlapping samples are gridded.
+ 
+        Gridding multiple points is better, because giving the
+        GPU more work to do allows it to hide memory latency
+        better. The call to d_gridKernel() is asynchronous
+        so subsequent calls to gridStep() overlap with the actual gridding.
+        */
+
         hipFuncSetCacheConfig(reinterpret_cast<const void*>(devGridKernel1), hipFuncCachePreferL1);
+
+        int step = 1;
 
         int count = 0;
         for (int dind = 0; dind < DSIZE; dind += step)
@@ -126,12 +145,21 @@ void GridderGPU<T2>::gridder()
 
     }
 
-    auto tKernel = omp_get_wtime();
+    hipEventRecord(stop);
+    hipEventSynchronize(stop);
+    hipEventElapsedTime(&tKernel, start, stop);
 
+    hipEventRecord(start);
+    hipEventSynchronize(start);
     gpuErrchk(hipMemcpy(gpuGrid.data(), dGrid, SIZE_GRID, hipMemcpyDeviceToHost));
     gpuCheckErrors("hipMemcpy D2H failure");
+    hipEventRecord(stop);
+    hipEventSynchronize(stop);
+    hipEventElapsedTime(&tD2H, start, stop);
 
     // Deallocate device vectors
+    hipEventRecord(start);
+    hipEventSynchronize(start);
     gpuErrchk(hipFree(dData));
     gpuErrchk(hipFree(dGrid));
     gpuErrchk(hipFree(dC));
@@ -139,19 +167,22 @@ void GridderGPU<T2>::gridder()
     gpuErrchk(hipFree(dIU));
     gpuErrchk(hipFree(dIV));
     gpuCheckErrors("hipFree failure");
-    auto tFinal = omp_get_wtime();
+    hipEventRecord(stop);
+    hipEventSynchronize(stop);
+    hipEventElapsedTime(&tFrees, start, stop);
 
     cout << "\nDegridderGPU IN MILLISECONDS:" << endl;
     cout << left << setw(21) << "hipMallocs"
          << left << setw(21) << "hipMemcpys (H2D)"
          << left << setw(21) << "kernel"
-         << left << setw(21) << "total" << endl;;
+         << left << setw(21) << "hipMemcpys (D2H)"
+         << left << setw(21) << "frees" << endl;;
 
-    //cout << setprecision(2) << fixed;
-    cout << left << setw(21) << (tAlloc - tInit) * 1000.0
-         << left << setw(21) << (tH2D - tAlloc) * 1000.0
-         << left << setw(21) << (tKernel - tH2D) * 1000.0 
-         << left << setw(21) << (tFinal - tInit) * 1000.0 << endl;
+    cout << left << setw(21) << tAlloc
+         << left << setw(21) << tH2D
+         << left << setw(21) << tKernel
+         << left << setw(21) << tD2H
+         << left << setw(21) << tFrees << endl;
 }
 
 int gridStep(const int DSIZE, const int SSIZE, const int dind, const std::vector<int>& iu, const std::vector<int>& iv)

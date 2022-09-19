@@ -63,6 +63,7 @@ void devDegridKernel(
             //       Performance may be improved if separate warp reductions are used and loops are unrolled.
 
             // reductions 3 and 4 only work if support is a power of 2
+            // 2 and 3 seem to be the fastest from a small amount of testing. 1 is about twice as slow
             const int reduction = 2;
 
             switch (reduction)
