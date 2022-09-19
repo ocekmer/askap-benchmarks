@@ -62,35 +62,20 @@ void devGridKernel2(
     const int dind)
 {
 
+    const int SSIZE = 2 * support + 1;
+    assert(SSIZE == blockDim.x);
+
     const int bind = blockIdx.x;
     const int tind = threadIdx.x;
 
     const int dindLocal = dind + bind;
+    const Complex dataLocal = data[dindLocal];
 
-    const int SSIZE = 2 * support + 1;
-    assert(SSIZE == blockDim.x);
-
-    // The actual starting grid point
-    __shared__ int gindShared;
-
-    // The Convolution function point from which we offset
-    __shared__ int cindShared;
-
-    __shared__ Complex dataLocal;
-
-    if (tind == 0)
-    {
-        gindShared = iu[dindLocal] + GSIZE * iv[dindLocal] - support;
-        cindShared = cOffset[dindLocal];
-        dataLocal = data[dindLocal];
-    }
-    __syncthreads();
+    int gind = iu[dindLocal] + GSIZE * iv[dindLocal] - support;
+    int cind = cOffset[dindLocal];
 
     for (int row = 0; row < SSIZE; ++row)
     {
-        // Make a local copy from shared memory
-        int gind = gindShared + GSIZE * row;
-        int cind = cindShared + SSIZE * row;
 
         if (tind < SSIZE)
         {
@@ -100,6 +85,9 @@ void devGridKernel2(
             atomicAdd(&grid[gind].x + 2*tind,   tmp.x);
             atomicAdd(&grid[gind].x + 2*tind+1, tmp.y);
         }
+
+        gind += GSIZE;
+        cind += SSIZE;
 
     }
 
