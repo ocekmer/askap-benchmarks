@@ -62,7 +62,8 @@ void devDegridKernel(
             // Note: This hasn't gone as far as separate warp reductions. The whole thing is reduced together.
             //       Performance may be improved if separate warp reductions are used and loops are unrolled.
 
-            const int reduction = 4;
+            // reductions 3 and 4 only work if support is a power of 2
+            const int reduction = 2;
 
             switch (reduction)
             {
