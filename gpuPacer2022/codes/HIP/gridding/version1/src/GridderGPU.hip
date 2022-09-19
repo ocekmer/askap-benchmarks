@@ -122,7 +122,7 @@ void GridderGPU<T2>::gridder()
         hipDeviceProp_t devProp;
         hipGetDeviceProperties(&devProp, device);
  
-        int gridSize = devProp.maxGridSize[0]/(SSIZE+1);  // launch kernels for this number of samples at a time
+        int gridSize = devProp.maxGridSize[0]/(support+1);  // launch kernels for this number of samples at a time
         assert(SSIZE <= devProp.maxThreadsPerBlock);
 
         int count = 0;
