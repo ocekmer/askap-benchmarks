@@ -97,12 +97,8 @@ void devGridKernel2(
             //grid[gind + tind] = hipCfmaf(dataLocal, C[cind + tind], grid[gind + tind]);
             const Complex tmp = hipCmulf(dataLocal, C[cind + tind]);
             //grid[gind + tind] = hipCaddf(grid[gind + tind], tmp);
-            //atomicAdd(&grid[gind + tind].x, tmp.x);
-            //atomicAdd(&grid[gind + tind].y, tmp.y);
-            atomicAdd(&grid[gind].x+2*tind,   tmp.x);
-            atomicAdd(&grid[gind].x+2*tind+1, tmp.y);
-            //unsafeAtomicAdd(&grid[gind + tind].x, tmp.x);
-            //unsafeAtomicAdd(&grid[gind + tind].y, tmp.y);
+            atomicAdd(&grid[gind].x + 2*tind,   tmp.x);
+            atomicAdd(&grid[gind].x + 2*tind+1, tmp.y);
         }
 
     }
