@@ -36,7 +36,7 @@ void degridHelper(const Complex* dGrid,
     hipGetDeviceProperties(&devProp, device);
 
     int count = 0;
-    int gridSize = 1024*devProp.multiProcessorCount; // is starting size, will be reduced as required
+    int gridSize = devProp.maxGridSize[0]; // is starting size, will be reduced as required
 
     for (int dind = 0; dind < DSIZE; dind += gridSize)
     {
@@ -64,6 +64,7 @@ void degridHelper(const Complex* dGrid,
 template <typename T2>
 void DegridderGPU<T2>::degridder()
 {
+//    cout << "\nDegridding on GPU" << endl;
 
     // Device parameters
     const size_t SIZE_DATA = data.size() * sizeof(T2);

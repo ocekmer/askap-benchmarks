@@ -140,11 +140,11 @@ int main()
     // Degridding on GPU
     DegridderGPU<Value> degridderGPU(gpuGrid, SSIZE, DSIZE, GSIZE, support, C, cOffset, iu, iv, gpuOutData);
     tInit = omp_get_wtime();
-    for(int iter=0; iter<10; iter++ ){
+    for(int iter=0; iter<1000; iter++ ){
       degridderGPU.degridder();
     }
     tFin = omp_get_wtime();
-    auto timeDegridGPU = (tFin - tInit)*100.0; // in ms
+    auto timeDegridGPU = (tFin - tInit) ; // in ms
     
     //printVectorComplex.printVector(cpuOutData);
     //printVectorComplex.printVector(gpuOutData);
