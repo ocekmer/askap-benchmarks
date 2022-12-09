@@ -1,16 +1,20 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.7...3.20)
+if(${CMAKE_VERSION} VERSION_LESS 3.12)
+    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
+endif()
 
 # set the project name
 project(askap
 		VERSION 1.0
-        LANGUAGES HIP CXX)
+        LANGUAGES CUDA CXX)
 
 # specify C++ standard
 # set(CMAKE_CXX_STANDARD 17)
 # set(CMAKE_CXX_STANDARD_REQUIRED True)
-if(NOT DEFINED CMAKE_HIP_STANDARD)
-    set(CMAKE_HIP_STANDARD 17)
-    set(CMAKE_HIP_STANDARD_REQUIRED ON)
+
+if(NOT DEFINED CMAKE_CUDA_STANDARD)
+    set(CMAKE_CUDA_STANDARD 17)
+    set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 endif()
 
 configure_file(askapConfig.h.in askapConfig.h)
@@ -24,8 +28,9 @@ add_executable(askap main.cpp)
 
 find_package(OpenMP REQUIRED)
 if(OpenMP_CXX_FOUND)
-message(STATUS "OpenMP found")
-target_link_libraries(askap PUBLIC OpenMP::OpenMP_CXX)
+    message(STATUS "OpenMP found")
+    target_link_libraries(askap PUBLIC OpenMP::OpenMP_CXX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
 target_link_libraries(askap PUBLIC UtilitiesCMake)
