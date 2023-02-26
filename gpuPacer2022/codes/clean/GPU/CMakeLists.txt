@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.18)
 
 # set the project name
 project(askap
-		VERSION 1.0
+	VERSION 1.0
         LANGUAGES CXX)
 
 # specify C++ standard
@@ -34,18 +34,21 @@ endif()
 
 configure_file(askapConfig.h.in askapConfig.h)
 
-# add the include library
-add_subdirectory("utilities")
-add_subdirectory("src/Solvers")
-
 # add the executable
 add_executable(askap main.cpp)
 
 find_package(OpenMP REQUIRED)
 if(OpenMP_CXX_FOUND)
-message(STATUS "OpenMP found")
-target_link_libraries(askap PUBLIC OpenMP::OpenMP_CXX)
+    message(STATUS "OpenMP found")
+    target_link_libraries(askap PUBLIC OpenMP::OpenMP_CXX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -O2")
 endif()
+
+message(${CMAKE_CXX_FLAGS})
+
+# add the include library
+add_subdirectory("utilities")
+add_subdirectory("src/Solvers")
 
 target_link_libraries(askap PUBLIC UtilitiesCMake)
 target_link_libraries(askap PUBLIC SourceCodeCMake)

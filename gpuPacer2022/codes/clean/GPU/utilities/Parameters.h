@@ -16,8 +16,8 @@ static const int BLOCK_SIZE = 128; // CUDA maximum is 1024
 static const int GRID_SIZE = 512;
 
 // Solver selection
-//static const std::string refSolverName = "Golden";
-static const std::string refSolverName = "gpuOlder";
+static const std::string refSolverName = "Golden";
+//static const std::string refSolverName = "gpuOlder";
 //static const std::string refSolverName = "gpuPS";
 //static const std::string refSolverName = "gpuPSFullUnroll";
 // static const std::string testSolverName = "gpuPS";
