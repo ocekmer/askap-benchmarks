@@ -1,1 +1,0 @@
-DegridderGPULessIdle.cu

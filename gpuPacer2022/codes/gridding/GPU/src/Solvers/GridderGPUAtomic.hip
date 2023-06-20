@@ -1,1 +1,0 @@
-GridderGPUAtomic.cu

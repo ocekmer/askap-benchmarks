@@ -1,1 +1,0 @@
-DegridderGPUWarpShuffle.cu

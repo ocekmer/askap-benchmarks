@@ -1,1 +1,0 @@
-DegridderGPUInterleaved.cu

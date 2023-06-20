@@ -1,1 +1,0 @@
-DegridderGPUSequential.cu
