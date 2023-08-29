@@ -1,5 +1,5 @@
 # 2023 GPU PACER Workshop & Hackathon
-## TODO List
+## TO DO List
 - HIP Concurrency & pinned memory on ***Gridding*** & ***Degridding***
 - Using ***thrust*** library for ***CLEAN*** algorithm
 - Integration of the developed kernels into YandaSoft & check performance gain
