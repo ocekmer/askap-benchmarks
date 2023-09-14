@@ -1,9 +1,9 @@
 // Solver interface 
 #pragma once
 
-#include "../utilities/Parameters.h"
-#include "../utilities/gpuCommon.h"
-#include "../utilities/LoggerUtil.h"
+#include "../../Parameters.h"
+#include "../../utilities/include/GpuCommon.h"
+#include "../../utilities/include/LoggerUtil.h"
 
 #include <vector>
 #include <iostream>

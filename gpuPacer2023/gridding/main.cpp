@@ -47,15 +47,15 @@
     nSamples  : number of visibility samples
 */
 
-#include "utilities/MaxError.h"
-#include "utilities/Parameters.h"
-#include "utilities/PrintVector.h"
-#include "utilities/Setup.h"
-#include "src/IGridder.h"
-#include "src/SolverFactory.h"
-#include "utilities/WarmupGPU.h"
-#include "utilities/gpuCommon.h"
-#include "utilities/LoggerUtil.h"
+#include "Parameters.h"
+#include "solvers/interface/IGridder.h"
+#include "solvers/factory/SolverFactory.h"
+#include "utilities/include/WarmupGPU.h"
+#include "utilities/include/GpuCommon.h"
+#include "utilities/include/LoggerUtil.h"
+#include "utilities/include/PrintVector.h"
+#include "utilities/include/Setup.h"
+#include "utilities/include/MaxError.h"
 
 #include <iostream>
 #include <complex>
