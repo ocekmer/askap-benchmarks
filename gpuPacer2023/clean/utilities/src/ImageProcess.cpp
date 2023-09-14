@@ -1,4 +1,4 @@
-#include "ImageProcess.h"
+#include "../include/ImageProcess.h"
 
 using std::ofstream;
 using std::ifstream;

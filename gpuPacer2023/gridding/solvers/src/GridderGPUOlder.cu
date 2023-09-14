@@ -1,4 +1,4 @@
-#include "GridderGPUOlder.h"
+#include "../include/GridderGPUOlder.h"
 
 using std::cout;
 using std::endl;

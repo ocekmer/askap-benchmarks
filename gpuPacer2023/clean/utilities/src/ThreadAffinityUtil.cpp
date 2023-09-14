@@ -2,8 +2,8 @@
  *  \brief Get thread to core affinity
  */
 
-#include "gpuCommon.h"
-#include "LoggerUtil.h"
+#include "../include/GpuCommon.h"
+#include "../include/LoggerUtil.h"
 
 namespace logger_util {
 

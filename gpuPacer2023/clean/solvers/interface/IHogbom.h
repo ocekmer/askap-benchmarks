@@ -4,7 +4,7 @@
 #include <vector>
 #include <iostream>
 
-#include "../utilities/Parameters.h"
+#include "../../Parameters.h"
 
 class IHogbom
 {

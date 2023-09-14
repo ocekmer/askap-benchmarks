@@ -1,4 +1,4 @@
-#include "Golden.h"
+#include "../include/Golden.h"
 
 using std::cout;
 using std::endl;

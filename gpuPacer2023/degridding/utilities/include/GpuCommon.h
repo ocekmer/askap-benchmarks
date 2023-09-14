@@ -2,8 +2,7 @@
  *  \brief common gpu related items
  */
 
-#ifndef GPUCOMMON_H
-#define GPUCOMMON_H
+#pragma once
 
 #include <iostream>
 
@@ -146,4 +145,4 @@ do{                                                                             
     //std::cout << "[@" << __func__ << " L" << __LINE__ << "] :" << "Using " << __GPU_API__ << " Device " << device << ": " << devprop.name << std::endl; \
     }
 
-#endif
+

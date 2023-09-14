@@ -1,5 +1,4 @@
-#include "DegridderGPUTiled.h"
-#include "../../utilities/gpuCommon.h"
+#include "../include/DegridderGPUTiled.h"
 
 using std::cout;
 using std::endl;

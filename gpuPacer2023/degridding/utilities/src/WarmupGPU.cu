@@ -1,4 +1,4 @@
-#include "WarmupGPU.h"
+#include "../include/WarmupGPU.h"
 
 using std::vector;
 using std::cout;

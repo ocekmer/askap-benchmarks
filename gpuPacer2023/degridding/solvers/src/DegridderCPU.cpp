@@ -1,5 +1,5 @@
-#include "DegridderCPU.h"
-#include "../../utilities/LoggerUtil.h"
+#include "../include/DegridderCPU.h"
+
 
 using std::cout;
 using std::endl;

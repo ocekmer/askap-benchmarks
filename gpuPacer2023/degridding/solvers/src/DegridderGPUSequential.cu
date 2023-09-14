@@ -1,5 +1,4 @@
-#include "DegridderGPUSequential.h"
-#include "../../utilities/gpuCommon.h"
+#include "../include/DegridderGPUSequential.h"
 
 using std::cout;
 using std::endl;

@@ -1,4 +1,4 @@
-#include "GridderCPU.h"
+#include "../include/GridderCPU.h"
 
 using std::cout;
 using std::endl;

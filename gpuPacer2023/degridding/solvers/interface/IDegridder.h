@@ -1,7 +1,7 @@
 // Solver interface 
 #pragma once
 
-#include "../utilities/Parameters.h"
+#include "../../Parameters.h"
 
 #include <vector>
 #include <iostream>

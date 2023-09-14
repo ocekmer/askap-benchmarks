@@ -1,4 +1,4 @@
-#include "GridderGPUAtomicTiled.h"
+#include "../include/GridderGPUAtomicTiled.h"
 
 using std::cout;
 using std::endl;

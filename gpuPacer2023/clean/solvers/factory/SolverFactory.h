@@ -3,12 +3,12 @@
 #include <memory>
 #include <string>
 
-#include "IHogbom.h"
-#include "Solvers/GPUPS.h"
-#include "Solvers/GPUPSLastWUnrolled.h"
-#include "Solvers/GPUPSFullUnroll.h"
-#include "Solvers/GPUOlder.h"
-#include "Solvers/Golden.h"
+#include "../interface/IHogbom.h"
+#include "../include/GPUPS.h"
+#include "../include/GPUPSLastWUnrolled.h"
+#include "../include/GPUPSFullUnroll.h"
+#include "../include/GPUOlder.h"
+#include "../include/Golden.h"
 
 class SolverFactory
 {

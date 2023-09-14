@@ -2,8 +2,7 @@
  *  \brief this file contains all function prototypes for logging containing in MaxUtil.cpp, ThreadAffinityUtil.cpp and TimeUtil.cpp codes. Based on github.com/pelahi/profile_util repo
  */
 
-#ifndef _LOGGER_UTIL
-#define _LOGGER_UTIL
+#pragma once
 
 #include <cstring>
 #include <string>
@@ -23,7 +22,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/sysinfo.h>
-#include "gpuCommon.h"
+
+#include "GpuCommon.h"
 
 #ifdef _MPI
 #include <mpi.h>
@@ -477,4 +477,4 @@ namespace logger_util {
 #define NewTimerHostOnly() logger_util::Timer(__func__, std::to_string(__LINE__), false);
 //@}
 
-#endif
+

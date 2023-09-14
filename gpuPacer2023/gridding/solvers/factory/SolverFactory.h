@@ -3,11 +3,11 @@
 #include <memory>
 #include <string>
 
-#include "IGridder.h"
-#include "Solvers/GridderCPU.h"
-#include "Solvers/GridderGPUOlder.h"
-#include "Solvers/GridderGPUAtomic.h"
-#include "Solvers/GridderGPUAtomicTiled.h"
+#include "../interface/IGridder.h"
+#include "../include/GridderCPU.h"
+#include "../include/GridderGPUOlder.h"
+#include "../include/GridderGPUAtomic.h"
+#include "../include/GridderGPUAtomicTiled.h"
 
 template <typename T2>
 class SolverFactory

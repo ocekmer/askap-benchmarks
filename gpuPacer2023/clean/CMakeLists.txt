@@ -63,8 +63,8 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lmpi_gtl_hsa -lmpi -I/opt
 target_link_libraries(askap PUBLIC MPI::MPI_CXX)
 
 # add the include library
-add_subdirectory("utilities")
-add_subdirectory("src/Solvers")
+add_subdirectory("utilities/src")
+add_subdirectory("solvers/src")
 
 target_link_libraries(askap PUBLIC UtilitiesCMake)
 target_link_libraries(askap PUBLIC SourceCodeCMake)
@@ -78,8 +78,7 @@ message(${CMAKE_EXE_LINKER_FLAGS})
 
 target_include_directories(askap PUBLIC
                            "${PROJECT_BINARY_DIR}"
-                           "${PROJECT_BINARY_DIR}/utilities"
-                           "${PROJECT_BINARY_DIR}/src"
-                           "${PROJECT_BINARY_DIR}/src/Solvers"
-                           "${PROJECT_BINARY_DIR}/data"
+                           "${PROJECT_BINARY_DIR}/utilities/src"
+                           "${PROJECT_BINARY_DIR}/solvers/src"
+                           
                            )

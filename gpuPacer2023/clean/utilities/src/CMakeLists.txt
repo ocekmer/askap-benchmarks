@@ -7,4 +7,5 @@ add_library (UtilitiesCMake
     TimeUtil.cpp 
     WarmupGPU.hip
     WarmupGPU.cu
+    Hello.cpp
     )

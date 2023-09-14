@@ -1,5 +1,4 @@
-#include "MaxError.h"
-#include "LoggerUtil.h"
+#include "../include/MaxError.h"
 
 using std::cout;
 using std::endl;

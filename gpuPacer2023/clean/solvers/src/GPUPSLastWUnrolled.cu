@@ -1,4 +1,4 @@
-#include "GPUPSLastWUnrolled.h"
+#include "../include/GPUPSLastWUnrolled.h"
 
 using std::vector;
 using std::cout;

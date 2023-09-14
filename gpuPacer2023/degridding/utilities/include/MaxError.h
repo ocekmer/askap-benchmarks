@@ -4,6 +4,8 @@
 #include <complex>
 #include <iostream>
 
+#include "../include/LoggerUtil.h"
+
 template <typename T>
 class MaxError
 {

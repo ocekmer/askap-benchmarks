@@ -1,4 +1,4 @@
-#include "DegridderGPUWarpShuffle.h"
+#include "../include/DegridderGPUWarpShuffle.h"
 
 using std::cout;
 using std::endl;

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../utilities/Parameters.h"
-#include "../utilities/RandomVectorGenerator.h"
+#include "../../Parameters.h"
+#include "../include/RandomVectorGenerator.h"
 
 #include <vector>
 #include <iostream>

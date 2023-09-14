@@ -1,4 +1,4 @@
-#include "GPUPS.h"
+#include "../include/GPUPS.h"
 
 using std::vector;
 using std::cout;

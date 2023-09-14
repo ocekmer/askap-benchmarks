@@ -2,7 +2,7 @@
 
 // Utilities
 #include "MaxError.h"
-#include "gpuCommon.h"
+#include "GpuCommon.h"
 #include "LoggerUtil.h"
 
 // Standard libs

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../IDegridder.h"
-#include "../../utilities/gpuCommon.h"
+#include "../interface/IDegridder.h"
+#include "../../utilities/include/LoggerUtil.h"
+#include "../../utilities/include/GpuCommon.h"
 
 #include <vector>
 #include <iostream>

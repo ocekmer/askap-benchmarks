@@ -4,14 +4,15 @@
 #include <omp.h>
 #include <memory>
 
-#include "utilities/ImageProcess.h"
-#include "utilities/Parameters.h"
-#include "utilities/MaxError.h"
-#include "utilities/WarmupGPU.h"
-#include "utilities/gpuCommon.h"
-#include "utilities/LoggerUtil.h"
-#include "src/IHogbom.h"
-#include "src/SolverFactory.h"
+#include "Parameters.h"
+
+#include "utilities/include/ImageProcess.h"
+#include "utilities/include/MaxError.h"
+#include "utilities/include/WarmupGPU.h"
+#include "utilities/include/GpuCommon.h"
+#include "utilities/include/LoggerUtil.h"
+#include "solvers/interface/IHogbom.h"
+#include "solvers/factory/SolverFactory.h"
 
 using std::cout;
 using std::cerr;

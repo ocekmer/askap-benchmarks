@@ -1,4 +1,4 @@
-#include "DegridderGPULessIdle.h"
+#include "../include/DegridderGPULessIdle.h"
 
 using std::cout;
 using std::endl;

@@ -1,9 +1,9 @@
 #pragma once
 
 // Utilities
-#include "MaxError.h"
-#include "gpuCommon.h"
-#include "LoggerUtil.h"
+#include "../include/MaxError.h"
+#include "../include/GpuCommon.h"
+#include "../include/LoggerUtil.h"
 
 // Standard libs
 #include <vector>

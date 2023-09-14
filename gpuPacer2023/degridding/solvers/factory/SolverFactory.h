@@ -3,13 +3,13 @@
 #include <memory>
 #include <string>
 
-#include "IDegridder.h"
-#include "Solvers/DegridderCPU.h"
-#include "Solvers/DegridderGPUInterleaved.h"
-#include "Solvers/DegridderGPUSequential.h"
-#include "Solvers/DegridderGPULessIdle.h"
-#include "Solvers/DegridderGPUTiled.h"
-#include "Solvers/DegridderGPUWarpShuffle.h"
+#include "../interface/IDegridder.h"
+#include "../include/DegridderCPU.h"
+#include "../include/DegridderGPUInterleaved.h"
+#include "../include/DegridderGPUSequential.h"
+#include "../include/DegridderGPULessIdle.h"
+#include "../include/DegridderGPUTiled.h"
+#include "../include/DegridderGPUWarpShuffle.h"
 
 template <typename T2>
 class SolverFactory

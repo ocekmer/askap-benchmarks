@@ -1,4 +1,4 @@
-#include "DegridderGPUInterleaved.h"
+#include "../include/DegridderGPUInterleaved.h"
 
 using std::cout;
 using std::endl;

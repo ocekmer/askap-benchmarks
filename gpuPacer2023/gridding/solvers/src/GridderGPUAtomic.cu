@@ -1,6 +1,4 @@
-#include "GridderGPUAtomic.h"
-#include "../../utilities/include/GpuCommon.h"
-#include "../../utilities/LoggerUtil.h"
+#include "../include/GridderGPUAtomic.h"
 
 using std::cout;
 using std::endl;

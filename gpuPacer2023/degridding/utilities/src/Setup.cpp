@@ -1,4 +1,4 @@
-#include "Setup.h"
+#include "../include/Setup.h"
 
 using std::cout;
 using std::endl;

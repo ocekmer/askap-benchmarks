@@ -2,7 +2,7 @@
  *  \brief Get timing
  */
 
-#include "LoggerUtil.h"
+#include "../include/LoggerUtil.h"
 
 /// get the time taken to do some comptue 
 namespace logger_util {

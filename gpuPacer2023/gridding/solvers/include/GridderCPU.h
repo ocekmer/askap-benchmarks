@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../IGridder.h"
-#include "../../utilities/LoggerUtil.h"
+#include "../interface/IGridder.h"
+#include "../../utilities/include/LoggerUtil.h"
 
 #include <vector>
 #include <iostream>
