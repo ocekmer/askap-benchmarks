@@ -1,5 +1,5 @@
 #include "GridderGPUAtomic.h"
-#include "../../utilities/gpuCommon.h"
+#include "../../utilities/include/GpuCommon.h"
 #include "../../utilities/LoggerUtil.h"
 
 using std::cout;
