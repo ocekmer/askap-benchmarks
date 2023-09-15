@@ -4,7 +4,7 @@
 - Using ***thrust*** library for ***CLEAN*** algorithm
 - Integration of the developed kernels into YandaSoft & check performance gain
 - ~~Create a hello class for the kernels to check the used chiplet (slurm socket) & GPU combination~~
-- ***Omniperf*** will be used to profile the codes
+- ***Omniperf*** and ***Omnitrace*** will be used to profile the codes
 - Continuous roofline analysis for each developed kernel 
 - SYCL?
 
