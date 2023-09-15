@@ -21,74 +21,6 @@
 ### ASKAP - CLEAN
 
 
-## Running non-exclusive jobs 
-### Single-thread
-- First, jobs were built to work as non-exclusive to reproduce the results in the tutorial
-- The following is the first case with a single node, single thread, 3 tasks and 3 GPUs
-```
-salloc -N 1 -n 3 -c 8 --sockets-per-node=3 --gpus-per-node=3 -A director2196-gpu --partition=gpu-dev --time=00:30:00
-
-//module load PrgEnv-gnu craype-accel-amd-gfx90a rocm/5.4.3 cmake/3.21.4
-module load PrgEnv-gnu craype-accel-amd-gfx90a rocm/5.2.3 cmake/3.24.3
-export PATH=$PATH:${CRAY_MPICH_DIR}/bin
-export CPATH=$CPATH:${CRAY_MPICH_DIR}/include
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CRAY_MPICH_DIR}/lib/
-export MPICH_GPU_SUPPORT_ENABLED=1
-
-cmake ../
-make
-
-CPU_BIND=$(generate_CPU_BIND.sh map_cpu)
-echo $CPU_BIND
-
-export OMP_NUM_THREADS=1
-srun -N 1 -n 3 -c 8 --cpu-bind=${CPU_BIND} ../selectGPU_X.sh ./hello | sort -n
-```
-
-#### Result
-```
-MPI 0 - OMP 0 - HWT 23 - Node nid002948 - RT_GPU_ID 0 - GPU_ID 0 - Bus_ID c9
-MPI 1 - OMP 0 - HWT 7 - Node nid002948 - RT_GPU_ID 0 - GPU_ID 1 - Bus_ID d1
-MPI 2 - OMP 0 - HWT 15 - Node nid002948 - RT_GPU_ID 0 - GPU_ID 2 - Bus_ID d6
-```
-
-### Multi-thread
-- The following is the first case with a single node, multi-thread, multi-GPU
-```
-salloc -N 1 -n 3 -c 8 --sockets-per-node=3 --gpus-per-node=3 -A director2196-gpu --partition=gpu-dev --time=00:30:00
-
-module load PrgEnv-gnu craype-accel-amd-gfx90a rocm/5.4.3 cmake/3.21.4
-export PATH=$PATH:${CRAY_MPICH_DIR}/bin
-export CPATH=$CPATH:${CRAY_MPICH_DIR}/include
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CRAY_MPICH_DIR}/lib/
-export MPICH_GPU_SUPPORT_ENABLED=1
-
-cmake ../
-make
-
-CPU_BIND=$(generate_CPU_BIND.sh mask_cpu)
-echo $CPU_BIND
-
-export OMP_NUM_THREADS=4
-srun -N 1 -n 3 -c 8 --cpu-bind=${CPU_BIND} ../selectGPU_X.sh ./hello | sort -n
-```
-#### Result
-- !!! There is a problem with OMP
-```
-MPI 0 - OMP 0 - HWT 16 - Node nid002948 - RT_GPU_ID 0 - GPU_ID 0 - Bus_ID c9
-MPI 0 - OMP 0 - HWT 17 - Node nid002948 - RT_GPU_ID 0 - GPU_ID 0 - Bus_ID c9
-MPI 0 - OMP 0 - HWT 18 - Node nid002948 - RT_GPU_ID 0 - GPU_ID 0 - Bus_ID c9
-MPI 0 - OMP 0 - HWT 23 - Node nid002948 - RT_GPU_ID 0 - GPU_ID 0 - Bus_ID c9
-MPI 1 - OMP 0 - HWT 0 - Node nid002948 - RT_GPU_ID 0 - GPU_ID 1 - Bus_ID d1
-MPI 1 - OMP 0 - HWT 1 - Node nid002948 - RT_GPU_ID 0 - GPU_ID 1 - Bus_ID d1
-MPI 1 - OMP 0 - HWT 2 - Node nid002948 - RT_GPU_ID 0 - GPU_ID 1 - Bus_ID d1
-MPI 1 - OMP 0 - HWT 7 - Node nid002948 - RT_GPU_ID 0 - GPU_ID 1 - Bus_ID d1
-MPI 2 - OMP 0 - HWT 10 - Node nid002948 - RT_GPU_ID 0 - GPU_ID 2 - Bus_ID d6
-MPI 2 - OMP 0 - HWT 15 - Node nid002948 - RT_GPU_ID 0 - GPU_ID 2 - Bus_ID d6
-MPI 2 - OMP 0 - HWT 8 - Node nid002948 - RT_GPU_ID 0 - GPU_ID 2 - Bus_ID d6
-MPI 2 - OMP 0 - HWT 9 - Node nid002948 - RT_GPU_ID 0 - GPU_ID 2 - Bus_ID d6
-```
-
 ## Running exclusive jobs 
 ### 8 GPUs, each controled by 1 MPI task 
 - 2 techniques explained above should be used
@@ -100,9 +32,9 @@ MPI 2 - OMP 0 - HWT 9 - Node nid002948 - RT_GPU_ID 0 - GPU_ID 2 - Bus_ID d6
     - a ***slurm-socket***: an L3 cache group chiplet with 8 cores
 
 ```
-salloc -N 1 -n 8 -c 8 --sockets-per-node=8 --gpus-per-node=8 -A director2196-gpu --partition=gpu-dev --exclusive --time=00:30:00
+salloc -N 1 -A accountName-gpu --partition=gpu-dev --exclusive --time=00:10:00
 
-module load PrgEnv-gnu craype-accel-amd-gfx90a rocm/5.4.3 cmake/3.21.4
+module load PrgEnv-gnu craype-accel-amd-gfx90a rocm/5.2.3 cmake/3.24.3
 export PATH=$PATH:${CRAY_MPICH_DIR}/bin
 export CPATH=$CPATH:${CRAY_MPICH_DIR}/include
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CRAY_MPICH_DIR}/lib/
@@ -115,7 +47,7 @@ CPU_BIND=$(generate_CPU_BIND.sh mask_cpu)
 echo $CPU_BIND
 
 export OMP_NUM_THREADS=4
-srun -l -u -c 8 --cpu-bind=${CPU_BIND} ../selectGPU_X.sh ./hello | sort -n
+srun -N 1 -n 8 -c 8 --cpu-bind=${CPU_BIND} ../selectGPU_X.sh ./hello | sort -n
 ```
 
 #### Result
@@ -153,6 +85,11 @@ srun -l -u -c 8 --cpu-bind=${CPU_BIND} ../selectGPU_X.sh ./hello | sort -n
 7: MPI 7 - OMP 0 - HWT 43 - Node nid002876 - RT_GPU_ID 0 - GPU_ID 7 - Bus_ID de
 7: MPI 7 - OMP 0 - HWT 43 - Node nid002876 - RT_GPU_ID 0 - GPU_ID 7 - Bus_ID de
 7: MPI 7 - OMP 0 - HWT 43 - Node nid002876 - RT_GPU_ID 0 - GPU_ID 7 - Bus_ID de
+```
+
+or:
+```
+srun -N 1 -n 8 -c 8 --gpu-bind=closest ./hello | sort -n
 ```
 
 ## TO DO LIST
