@@ -9,6 +9,7 @@
 #include "utilities/include/ImageProcess.h"
 #include "utilities/include/MaxError.h"
 #include "utilities/include/WarmupGPU.h"
+#include "utilities/include/WarmupSetup.h"
 #include "utilities/include/GpuCommon.h"
 #include "utilities/include/LoggerUtil.h"
 #include "solvers/interface/IHogbom.h"
@@ -55,14 +56,15 @@ int main()
 	// Reports some parameters
 	LocalLog() << "Iterations: " << gNiters << endl;
 	LocalLog() << "Image dimension: " << DIRTY_DIM << " x " << DIRTY_DIM << endl;
-	WarmupGPU warmupGPU;
 
 	// WARMUP
-	if (refSolverName != "Golden")
-	{
-		// Warmup
-		warmupGPU.warmup();
-	}
+	WarmupGPU warmupGPU;
+    warmupSetup();
+    if (refGPU)
+    {
+        warmupGPU.warmup();
+        cout << "Warmup for reference solver: " << refSolverName << endl;
+    }
 	
 	// REFERENCE SOLVER
 	vector<float> refResidual(dirty.size(), 0.0);
@@ -76,11 +78,11 @@ int main()
 	runtimeRef = timer.get() * 1e-6;
 	
 	// WARMUP
-	if (refSolverName == "Golden")
-	{
-		// Warmup
-		warmupGPU.warmup();
-	}
+	if ((!refGPU) && testGPU)
+    {
+        warmupGPU.warmup();
+        cout << "Warmup for test solver: " << testSolverName << endl;
+    }
 
 	// NEW SOLVER TEST
 	vector<float> testResidual(dirty.size(), 0.0);

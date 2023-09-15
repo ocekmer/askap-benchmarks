@@ -16,20 +16,21 @@ static const int BLOCK_SIZE = 128; // CUDA maximum is 1024
 static const int GRID_SIZE = 512;
 
 // Solver selection
-static const std::string refSolverName = "Golden";
-//static const std::string refSolverName = "gpuOlder";
-//static const std::string refSolverName = "gpuPS";
-//static const std::string refSolverName = "gpuPSFullUnroll";
-// static const std::string testSolverName = "gpuPS";
+static const std::string refSolverName = "cpu";
 static const std::string testSolverName = "gpuPSFullUnroll";
 
 /*
 	Solvers explanation:
-	- Golden: CPU solver
+	- cpu: CPU solver
+	- cpuSimpler: CPU solver with a simplified code
+	- openMPOld: OpenMP solver used in YandaSoft
+	- openMP: A recently developed OpenMP solver
+	- openMPNew: A recently developed OpenMP solver
 	- gpuOlder: Solver from the previous hackathon, uses shared memory, standard find max
 	- gpuPS: parallel sweep
 	- gpuPSLastWUnrolled: parallel sweep, last warp unrolled
 	- gpuPSFullUnroll: parallel sweep, full unroll 
+	- gpuSimpler: A simplified GPU solver with a better performance
 */
 
 

@@ -51,6 +51,7 @@
 #include "solvers/interface/IGridder.h"
 #include "solvers/factory/SolverFactory.h"
 #include "utilities/include/WarmupGPU.h"
+#include "utilities/include/WarmupSetup.h"
 #include "utilities/include/GpuCommon.h"
 #include "utilities/include/LoggerUtil.h"
 #include "utilities/include/PrintVector.h"
@@ -123,13 +124,13 @@ int main()
     vector<Value> testGrid(GSIZE * GSIZE);
     testGrid.assign(testGrid.size(), static_cast<Value>(0.0));
 
-    WarmupGPU warmupGPU;
-
     // WARMUP
-    if (refSolverName != "cpu")
+	WarmupGPU warmupGPU;
+    warmupSetup();
+    if (refGPU)
     {
-        // Warmup
         warmupGPU.warmup();
+        cout << "Warmup for reference solver: " << refSolverName << endl;
     }
 
     // Reference gridder
@@ -141,10 +142,10 @@ int main()
     auto timeGridRef = tInit.get() * 1e-6;
 
     // WARMUP
-    if (refSolverName == "cpu")
+	if ((!refGPU) && testGPU)
     {
-        // Warmup
         warmupGPU.warmup();
+        cout << "Warmup for test solver: " << testSolverName << endl;
     }
 
     // Test gridder

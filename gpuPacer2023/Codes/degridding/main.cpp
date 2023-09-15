@@ -52,6 +52,7 @@
 #include "solvers/interface/IDegridder.h"
 #include "solvers/factory/SolverFactory.h"
 #include "utilities/include/WarmupGPU.h"
+#include "utilities/include/WarmupSetup.h"
 #include "utilities/include/LoggerUtil.h"
 #include "utilities/include/MaxError.h"
 #include "utilities/include/PrintVector.h"
@@ -125,13 +126,13 @@ int main()
     vector<Value> grid(GSIZE * GSIZE);
     grid.assign(grid.size(), static_cast<Value>(1.0));
 
-    WarmupGPU warmupGPU;
-
     // WARMUP
-    if (refSolverName != "cpu")
+	WarmupGPU warmupGPU;
+    warmupSetup();
+    if (refGPU)
     {
-        // Warmup
         warmupGPU.warmup();
+        cout << "Warmup for reference solver: " << refSolverName << endl;
     }
    
     // Reference degridder
@@ -143,10 +144,10 @@ int main()
     auto timeDegridRef = timer.get() * 1e-6;
 
     // WARMUP
-    if (refSolverName == "cpu")
+	if ((!refGPU) && testGPU)
     {
-        // Warmup
         warmupGPU.warmup();
+        cout << "Warmup for test solver: " << testSolverName << endl;
     }
 
     // Test gridder

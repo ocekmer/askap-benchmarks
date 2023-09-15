@@ -10,7 +10,7 @@ void vectorAdd(const float* a, const float* b, float* c, const size_t N)
 	size_t i = blockDim.x * blockIdx.x + threadIdx.x;
 	if (i < N)
 	{
-		for (int j = 0; j < 250; ++j)
+		for (int j = 0; j < 1000; ++j)
 		{
 			c[i] = a[i] + b[i];
 		}
