@@ -23,7 +23,7 @@
 #include <unistd.h>
 #include <sys/sysinfo.h>
 
-#include "../include/GpuCommon.h"
+#include "GpuCommon.h"
 
 #ifdef _MPI
 #include <mpi.h>

@@ -7,7 +7,7 @@ using std::complex;
 using std::vector;
 
 template<>
-void MaxError<complex<float>>::maxError(const std::vector<complex<float>>& v1, const std::vector<complex<float>>& v2) const
+void MaxError<complex<float>>::maxError(const Vector<complex<float>>& v1, const Vector<complex<float>>& v2) const
 {
     float maximumErrorReal = 0.0;
     float maximumErrorImag = 0.0;
@@ -40,7 +40,7 @@ void MaxError<complex<float>>::maxError(const std::vector<complex<float>>& v1, c
 }
 
 template<>
-void MaxError<complex<double>>::maxError(const std::vector<complex<double>>& v1, const std::vector<complex<double>>& v2) const
+void MaxError<complex<double>>::maxError(const Vector<complex<double>>& v1, const Vector<complex<double>>& v2) const
 {
     double maximumErrorReal = 0.0;
     double maximumErrorImag = 0.0;
@@ -72,7 +72,7 @@ void MaxError<complex<double>>::maxError(const std::vector<complex<double>>& v1,
 }
 
 template <typename T>
-void MaxError<T>::maxError(const std::vector<T>& v1, const std::vector<T>& v2) const
+void MaxError<T>::maxError(const Vector<T>& v1, const Vector<T>& v2) const
 {
     T maximumError = 0.0;
     try
@@ -94,6 +94,6 @@ void MaxError<T>::maxError(const std::vector<T>& v1, const std::vector<T>& v2) c
     LocalLog() << "Maximum Error: " << maximumError << endl;
 }
 
-template void MaxError<float>::maxError(const std::vector<float>& v1, const std::vector<float>& v2) const;
-template void MaxError<double>::maxError(const std::vector<double>& v1, const std::vector<double>& v2) const;
-template void MaxError<int>::maxError(const std::vector<int>& v1, const std::vector<int>& v2) const;
+template void MaxError<float>::maxError(const Vector<float>& v1, const Vector<float>& v2) const;
+template void MaxError<double>::maxError(const Vector<double>& v1, const Vector<double>& v2) const;
+template void MaxError<int>::maxError(const Vector<int>& v1, const Vector<int>& v2) const;

@@ -15,9 +15,16 @@
 
 #include <complex>
 
+#include "utilities/include/AskapTypes.h"
+
 typedef float Real;             // T0
 typedef double Coord;           // T1
 typedef std::complex<Real> Value;    // T2
+
+// Host memory type
+template <typename T>
+using Vector = std::vector<T>; // PAGEABLE
+// using Vector = pinnedVector<T>;  // PINNED
 
 // Can be changed for testing purposes
 //const int NSAMPLES = 1<<27; //(134 M)

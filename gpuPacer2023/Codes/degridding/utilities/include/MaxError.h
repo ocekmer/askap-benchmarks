@@ -4,11 +4,13 @@
 #include <complex>
 #include <iostream>
 
-#include "../include/LoggerUtil.h"
+#include "../../Parameters.h"
+
+#include "LoggerUtil.h"
 
 template <typename T>
 class MaxError
 {
 public:
-    void maxError(const std::vector<T>& v1, const std::vector<T>& v2) const;
+    void maxError(const Vector<T>& v1, const Vector<T>& v2) const;
 };

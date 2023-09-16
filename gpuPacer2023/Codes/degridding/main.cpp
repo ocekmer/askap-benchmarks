@@ -75,7 +75,6 @@ using std::setprecision;
 using std::setw;
 using std::fixed;
 
-
 int main()
 {
 	// report the parellelism and affinity
@@ -96,8 +95,8 @@ int main()
     vector<Coord> w(NSAMPLES, 0.0);
 
     //vector<Value> data(NSAMPLES * NCHAN);
-    vector<Value> refData(NSAMPLES * NCHAN, 0.0);
-    vector<Value> testData(NSAMPLES * NCHAN, 0.0);
+    Vector<Value> refData(NSAMPLES * NCHAN, 0.0);
+    Vector<Value> testData(NSAMPLES * NCHAN, 0.0);
     
     auto timeInitData = timer.get() * 1e-6;
 
@@ -105,14 +104,14 @@ int main()
     vector<Coord> freq(NCHAN, 0.0);
 
     // Initialize convolution function & offsets
-    vector<Value> C;
+    Vector<Value> C;
     int support;
     int overSample;
-    vector<int> cOffset;
+    Vector<int> cOffset;
 
     // Vectors of grid centers
-    vector<int> iu;
-    vector<int> iv;
+    Vector<int> iu;
+    Vector<int> iv;
     Coord wCellSize;
 
     Setup<Real, Coord, Value> setup(support, overSample, wCellSize, u, v, w, freq, cOffset, iu, iv, C);
@@ -123,7 +122,7 @@ int main()
 
     const size_t SSIZE = 2 * support + 1;
     const size_t DSIZE = NSAMPLES * NCHAN;
-    vector<Value> grid(GSIZE * GSIZE);
+    Vector<Value> grid(GSIZE * GSIZE);
     grid.assign(grid.size(), static_cast<Value>(1.0));
 
     // WARMUP
