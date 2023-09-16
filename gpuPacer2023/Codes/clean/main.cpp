@@ -12,6 +12,7 @@
 #include "utilities/include/WarmupSetup.h"
 #include "utilities/include/GpuCommon.h"
 #include "utilities/include/LoggerUtil.h"
+#include "utilities/include/Hello.h"
 #include "solvers/interface/IHogbom.h"
 #include "solvers/factory/SolverFactory.h"
 
@@ -26,6 +27,20 @@ using std::fixed;
 
 int main()
 {
+	MPI_Init(&argc, &argv);
+    int size;
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    char name[MPI_MAX_PROCESSOR_NAME];
+    int resultlength; // dummy
+    MPI_Get_processor_name(name, &resultlength);
+
+    Hello hello(size, rank, name);
+    hello.hello();   
+
 	// report the parellelism and affinity
 	LogParallelAPI();
 	LogBinding();
@@ -117,5 +132,5 @@ int main()
 	imagProc.writeImage("model.img", refModel);
 	*/
 	
-	return 0;
+	MPI_Finalize();
 }

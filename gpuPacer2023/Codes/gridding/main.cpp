@@ -57,6 +57,7 @@
 #include "utilities/include/PrintVector.h"
 #include "utilities/include/Setup.h"
 #include "utilities/include/MaxError.h"
+#include "utilities/include/Hello.h"
 
 #include <iostream>
 #include <complex>
@@ -77,6 +78,22 @@ using std::fixed;
 
 int main()
 {
+	MPI_Init(&argc, &argv);
+    int size;
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    char name[MPI_MAX_PROCESSOR_NAME];
+    int resultlength; // dummy
+    MPI_Get_processor_name(name, &resultlength);
+
+    Hello hello(size, rank, name);
+    hello.hello();   
+
+	
+
     // Print vector object
     PrintVector<Value> printVectorComplex;
     PrintVector<Coord> printVector;
@@ -170,4 +187,6 @@ int main()
         << left << setw(21) << timeGridRef
         << left << setw(21) << timeGridTest 
         << left << setw(21) << timeGridRef/timeGridTest << endl;
+    
+    MPI_Finalize();
 }
