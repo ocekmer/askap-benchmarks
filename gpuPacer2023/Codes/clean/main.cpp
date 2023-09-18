@@ -3,6 +3,7 @@
 #include <vector>
 #include <omp.h>
 #include <memory>
+#include <mpi.h>
 
 #include "Parameters.h"
 
@@ -25,7 +26,7 @@ using std::setprecision;
 using std::setw;
 using std::fixed;
 
-int main()
+int main(int argc, char *argv[])
 {
 	MPI_Init(&argc, &argv);
     int size;

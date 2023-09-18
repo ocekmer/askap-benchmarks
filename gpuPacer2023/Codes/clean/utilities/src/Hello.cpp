@@ -7,6 +7,7 @@ using std::to_string;
 
 void Hello::hello() const
 {
+	/*
     // If ROCR_VISIBLE_DEVICES is set, capture visible GPUs
     const char* gpu_id_list;
     const char* gpu_visible_devices = getenv(GPU_VISIBLE_DEVICES);
@@ -85,5 +86,6 @@ void Hello::hello() const
         }
 
     }
+    */
 }
 

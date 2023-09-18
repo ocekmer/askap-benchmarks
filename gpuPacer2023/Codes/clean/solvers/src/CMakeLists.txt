@@ -5,13 +5,9 @@ add_library (SourceCodeCMake
     OpenMP.cpp
     OpenMPOld.cpp
     OpenMPNew.cpp
-    GPUOlder.hip 
-    GPUPS.hip 
-    GPUPSFullUnroll.hip 
-    GPUPSLastWUnrolled.hip
-    GPUOlder.cu 
-    GPUPS.cu 
-    GPUPSFullUnroll.cu 
-    GPUPSLastWUnrolled.cu
-    GPUSimpler.hip
+    GpuSimpler.hip
+    GpuOlder.hip 
+    GpuPS.hip 
+    GpuPSFullUnroll.hip 
+    GpuPSLastWUnrolled.hip 
     )

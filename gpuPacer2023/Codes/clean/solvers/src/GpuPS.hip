@@ -1,4 +1,4 @@
-#include "../include/GpuSimpler.h"
+#include "../include/GpuPS.h"
 
 using std::vector;
 using std::cout;
@@ -7,7 +7,7 @@ using std::min;
 using std::max;
 
 __global__
-void dFindPeak_Step2_Simpler(float* data, size_t* inIndex, size_t* outIndex, size_t n)
+void dFindPeak_Step2(float* data, size_t* inIndex, size_t* outIndex, size_t n)
 {
     __shared__ float TILE_VAL[BLOCK_SIZE];
     __shared__ size_t TILE_IDX[BLOCK_SIZE];
@@ -51,7 +51,7 @@ void dFindPeak_Step2_Simpler(float* data, size_t* inIndex, size_t* outIndex, siz
 }
 
 __global__
-void dFindPeak_Step1_Simpler(const float* data, float* outMax, size_t* outIndex, size_t n)
+void dFindPeak_Step1(const float* data, float* outMax, size_t* outIndex, size_t n)
 {
     __shared__ float TILE_VAL[BLOCK_SIZE];
     __shared__ size_t TILE_IDX[BLOCK_SIZE];
@@ -100,8 +100,28 @@ void dFindPeak_Step1_Simpler(const float* data, float* outMax, size_t* outIndex,
     }
 }
 
+__host__
+void GpuPS::reportDevice()
+{
+//    GPUReportDevice();
+}
+
+__host__ __device__
+GpuPS::Position GpuPS::idxToPos(const size_t idx, const int width)
+{
+    const int y = idx / width;
+    const int x = idx % width;
+    return GpuPS::Position(x, y);
+}
+
+__host__ __device__
+size_t GpuPS::posToIdx(const int width, const GpuPS::Position& pos)
+{
+    return (pos.y * width) + pos.x;
+}
+
 __global__
-void dSubtractPSF_Simpler(const float* dPsf,
+void dSubtractPSF(const float* dPsf,
     float* dResidual,
     const int imageWidth,
     const int startx, const int starty,
@@ -117,29 +137,29 @@ void dSubtractPSF_Simpler(const float* dPsf,
     // lies in the work area actually do work
     if (x <= stopx && y <= stopy)
     {
-        dResidual[y * imageWidth + x] -= gain * absPeakVal
-            * dPsf[(y - diffy) * imageWidth + (x - diffx)];
+        dResidual[GpuPS::posToIdx(imageWidth, GpuPS::Position(x, y))] -= gain * absPeakVal
+            * dPsf[GpuPS::posToIdx(imageWidth, GpuPS::Position(x - diffx, y - diffy))];
     }
 }
 
 __host__
-void GpuSimpler::subtractPSF(const size_t peakPos,
+void GpuPS::subtractPSF(const size_t peakPos,
     const size_t psfPeakPos,
     const float absPeakVal)
 {
     const int blockDim = 16;
 
-    const int rx = peakPos % imageWidth;
-    const int ry = peakPos / imageWidth;
+    const int rx = idxToPos(peakPos, imageWidth).x;
+    const int ry = idxToPos(peakPos, imageWidth).y;
 
-    const int px = psfPeakPos % imageWidth;
-    const int py = psfPeakPos / imageWidth;
+    const int px = idxToPos(psfPeakPos, imageWidth).x;
+    const int py = idxToPos(psfPeakPos, imageWidth).y;
 
     const int diffx = rx - px;
     const int diffy = ry - px;
 
-    const int startx = max(0, diffx);
-    const int starty = max(0, diffy);
+    const int startx = max(0, rx - px);
+    const int starty = max(0, ry - py);
 
     const int stopx = min(imageWidth - 1, rx + (imageWidth - px - 1));
     const int stopy = min(imageWidth - 1, ry + (imageWidth - py - 1));
@@ -150,48 +170,12 @@ void GpuSimpler::subtractPSF(const size_t peakPos,
 
     dim3 numBlocks(blocksx, blocksy);
     dim3 threadsPerBlock(blockDim, blockDim);
-    dSubtractPSF_Simpler3 << <numBlocks, threadsPerBlock >> > (dPsf, dResidual, imageWidth,
+    dSubtractPSF <<<numBlocks, threadsPerBlock>>> (dPsf, dResidual, imageWidth,
         startx, starty, stopx, stopy, diffx, diffy, absPeakVal, gGain);
     gpuCheckErrors("kernel launch failure in subtractPSF");
 }
 
-__host__
-void GpuSimpler::subtractPSF2(const int &px, const int &py, const size_t &peakPos,
-    const float &absPeakVal)
-{
-    const int blockDim = 16;
-
-    const int rx = peakPos % imageWidth;
-    const int ry = peakPos / imageWidth;
-
-    const int diffx = rx - px;
-    const int diffy = ry - px;
-
-    const int startx = (0 > diffx) ? 0 : diffx;
-    const int starty = (0 > diffy) ? 0 : diffy;
-
-    //const int startx = max(0, diffx);
-    //const int starty = max(0, diffy);
-
-    const int stopx = ((imageWidth - 1) < (rx + (imageWidth - px - 1))) ? (imageWidth - 1) : (rx + (imageWidth - px - 1));
-    const int stopy = ((imageWidth - 1) < (ry + (imageWidth - py - 1))) ? (imageWidth - 1) : (ry + (imageWidth - py - 1));
-
-    //const int stopx = min(imageWidth - 1, rx + (imageWidth - px - 1));
-    //const int stopy = min(imageWidth - 1, ry + (imageWidth - py - 1));
-
-
-    // Note: Both start* and stop* locations are inclusive.
-    const int blocksx = ceil((stopx - startx + 1.0) / static_cast<float>(blockDim));
-    const int blocksy = ceil((stopy - starty + 1.0) / static_cast<float>(blockDim));
-
-    dim3 numBlocks(blocksx, blocksy);
-    dim3 threadsPerBlock(blockDim, blockDim);
-    dSubtractPSF_Simpler3 << <numBlocks, threadsPerBlock >> > (dPsf, dResidual, imageWidth,
-        startx, starty, stopx, stopy, diffx, diffy, absPeakVal, gGain);
-    gpuCheckErrors("kernel launch failure in subtractPSF");
-}
-
-void GpuSimpler::deconvolve()
+void GpuPS::deconvolve()
 {
     reportDevice();
 
@@ -203,8 +187,54 @@ void GpuSimpler::deconvolve()
     // Copy data from host to device
     copyH2D();
 
+    // Find peak of psf
+    Peak psfPeak = findPeak(dPsf, psf.size());
+
+    LocalLog() << "Found peak of PSF: " << "Maximum = " << psfPeak.val
+        << " at location " << idxToPos(psfPeak.pos, imageWidth).x << ","
+        << idxToPos(psfPeak.pos, imageWidth).y << endl;
+
+    for (unsigned int i = 0; i < gNiters; ++i)
+    {
+        // Find peak in the residual image
+        Peak peak = findPeak(dResidual, residual.size());
+        if ((i + 1) % 100 == 0 || i == 0)
+        {
+            LocalLog() << "Iteration: " << i + 1 << " - Maximum = " << peak.val
+                << " at location " << idxToPos(peak.pos, imageWidth).x << ","
+                << idxToPos(peak.pos, imageWidth).y << ", index = " << peak.pos << endl;
+        }
+
+        // Check if threshold has been reached
+        if (abs(peak.val) < gThreshold)
+        {
+            LocalLog() << "Reached stopping threshold" << endl;
+            break;
+        }
+
+        // Subtract the PSF from the residual image
+        // This function will launch a kernel
+        // asynchronously, need to sync later
+        subtractPSF(peak.pos, psfPeak.pos, peak.val);
+        // Add to model
+        model[peak.pos] += peak.val * gGain;
+    }
+
+    copyD2H();
+
+}
+
+__host__
+GpuPS::Peak GpuPS::findPeak(const float* dData, size_t N)
+{
+    const size_t SIZE_DATA = N * sizeof(float);
     const size_t SIZE_MAX_VALUE = GRID_SIZE * sizeof(float);
     const size_t SIZE_MAX_INDEX = GRID_SIZE * sizeof(size_t);
+
+    // Host vector for max values
+    vector<float> hMax(GRID_SIZE, 0.0);
+    // Host vector for index values
+    vector<size_t> hIndex(GRID_SIZE, 0);
 
     // Device vectors
     float* dMax;
@@ -216,67 +246,9 @@ void GpuSimpler::deconvolve()
     gpuMalloc(&d2Index, sizeof(size_t));
     gpuCheckErrors("gpuMalloc failure!");
 
-    // Find peak of psf
-    float psfPeakVal = 0.0;
-    size_t psfPeakPos = 0;
-    findPeak(dMax, dIndex, d2Index, psfPeakVal, psfPeakPos, dPsf, psf.size());
-    const int px = psfPeakPos % imageWidth;
-    const int py = psfPeakPos / imageWidth;
-
-    cout << "Found peak of PSF: " << "Maximum = " << psfPeakVal
-        << " at location " << psfPeakPos % imageWidth << ","
-        << psfPeakPos / imageWidth << endl;
-    float peakVal;
-    size_t peakPos;
-    for (unsigned int i = 0; i < gNiters; ++i)
-    {
-        // Find peak in the residual image
-        peakVal = 0.0;
-        peakPos = 0;
-        findPeak(dMax, dIndex, d2Index, peakVal, peakPos, dResidual, residual.size());
-        if ((i + 1) % 100 == 0 || i == 0)
-        {
-            cout << "Iteration: " << i + 1 << " - Maximum = " << peakVal
-                << " at location " << peakPos % imageWidth << ","
-                << peakPos / imageWidth << ", index = " << peakPos << endl;
-        }
-
-        // Check if threshold has been reached
-        if (abs(peakVal) < gThreshold)
-        {
-            cout << "Reached stopping threshold" << endl;
-            break;
-        }
-
-        // Subtract the PSF from the residual image
-        // This function will launch a kernel
-        // asynchronously, need to sync later
-        subtractPSF2(px, py, peakPos, peakVal);
-        // Add to model
-        model[peakPos] += peakVal * gGain;
-    }
-
-    gpuFree(dMax);
-    gpuFree(dIndex);
-    gpuFree(d2Index);
-    gpuCheckErrors("gpuFree failure!");
-
-    copyD2H();
-}
-
-__host__
-void GpuSimpler::findPeak(float* dMax, size_t* dIndex, size_t* d2Index, float& peakValue, size_t& peakPos, const float* dData, size_t N)
-{
-    
-    // Host vector for max values
-    vector<float> hMax(GRID_SIZE, 0.0);
-    // Host vector for index values
-    vector<size_t> hIndex(GRID_SIZE, 0);
-
-    
-    dFindPeak_Step1_Simpler3 << <GRID_SIZE, BLOCK_SIZE >> > (dData, dMax, dIndex, N);
+    dFindPeak_Step1 <<<GRID_SIZE, BLOCK_SIZE>>> (dData, dMax, dIndex, N);
     gpuCheckErrors("gpu kernel launch 1 failure!");
-    dFindPeak_Step2_Simpler3 << <1, BLOCK_SIZE >> > (dMax, dIndex, d2Index, GRID_SIZE);
+    dFindPeak_Step2 <<<1, BLOCK_SIZE>>> (dMax, dIndex, d2Index, GRID_SIZE);
     gpuCheckErrors("gpu kernel launch 2 failure!");
 
     gpuMemcpy(hMax.data(), dMax, sizeof(float), gpuMemcpyDeviceToHost);
@@ -284,13 +256,20 @@ void GpuSimpler::findPeak(float* dMax, size_t* dIndex, size_t* d2Index, float& p
     gpuMemcpy(hIndex.data(), d2Index, sizeof(size_t), gpuMemcpyDeviceToHost);
     gpuCheckErrors("gpuMemcpy D2H failure in findPeak (hindex)!");
 
-    peakValue = hMax[0];
-    peakPos = hIndex[0];
+    Peak p;
+    p.val = hMax[0];
+    p.pos = hIndex[0];
 
-    
+
+    gpuFree(dMax);
+    gpuFree(dIndex);
+    gpuFree(d2Index);
+    gpuCheckErrors("gpuFree failure!");
+
+    return p;
 }
 
-void GpuSimpler::memAlloc()
+void GpuPS::memAlloc()
 {
     gpuMalloc(&dDirty, SIZE_IMAGE);
     gpuMalloc(&dPsf, SIZE_IMAGE);
@@ -298,15 +277,16 @@ void GpuSimpler::memAlloc()
     gpuCheckErrors("gpuMalloc failure");
 }
 
-GpuSimpler::~GpuSimpler()
+GpuPS::~GpuPS()
 {
     gpuFree(dDirty);
     gpuFree(dPsf);
     gpuFree(dResidual);
     gpuCheckErrors("gpuFree failure");
+    cout << "gpu PS destructor" << endl;
 }
 
-void GpuSimpler::copyH2D()
+void GpuPS::copyH2D()
 {
     gpuMemcpy(dDirty, dirty.data(), SIZE_IMAGE, gpuMemcpyHostToDevice);
     gpuMemcpy(dPsf, psf.data(), SIZE_IMAGE, gpuMemcpyHostToDevice);
@@ -314,8 +294,9 @@ void GpuSimpler::copyH2D()
     gpuCheckErrors("gpuMemcpy H2D failure");
 }
 
-void GpuSimpler::copyD2H()
+void GpuPS::copyD2H()
 {
     gpuMemcpy(residual.data(), dResidual, SIZE_IMAGE, gpuMemcpyDeviceToHost);
     gpuCheckErrors("gpuMemcpy D2H failure");
 }
+
