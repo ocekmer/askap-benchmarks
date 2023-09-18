@@ -9,11 +9,11 @@
 #include "../include/OpenMP.h"
 #include "../include/OpenMPOld.h"
 #include "../include/OpenMPNew.h"
-#include "../include/GPUPS.h"
-#include "../include/GPUPSLastWUnrolled.h"
-#include "../include/GPUPSFullUnroll.h"
-#include "../include/GPUOlder.h"
-#include "../include/GPUSimpler.h"
+#include "../include/GpuPS.h"
+#include "../include/GpuPSLastWUnrolled.h"
+#include "../include/GpuPSFullUnroll.h"
+#include "../include/GpuOlder.h"
+#include "../include/GpuSimpler.h"
 
 class SolverFactory
 {

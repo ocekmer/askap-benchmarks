@@ -7,7 +7,7 @@
 #include <cmath>
 #include <iostream>
 
-class gpuPSFullUnroll : public IHogbom
+class GpuPSFullUnroll : public IHogbom
 {
 private:
 	// device vectors
@@ -62,14 +62,14 @@ private:
 			const float absPeakVal, const float gain);
 
 public:
-	gpuPSFullUnroll(const std::vector<float>& dirty,
+	GpuPSFullUnroll(const std::vector<float>& dirty,
 		const std::vector<float>& psf,
 		const size_t imageWidth,
 		std::vector<float>& model,
 		std::vector<float>& residual) : IHogbom(dirty, psf, imageWidth,
 			model, residual) {}
 
-	virtual ~gpuPSFullUnroll();
+	virtual ~GpuPSFullUnroll();
 
 	// Public methods
 	void deconvolve() override;

@@ -1,4 +1,4 @@
-#include "../include/GPUPS.h"
+#include "../include/GpuPS.h"
 
 using std::vector;
 using std::cout;
@@ -101,21 +101,21 @@ void dFindPeak_Step1(const float* data, float* outMax, size_t* outIndex, size_t 
 }
 
 __host__
-void gpuPS::reportDevice()
+void GpuPS::reportDevice()
 {
 //    GPUReportDevice();
 }
 
 __host__ __device__
-gpuPS::Position gpuPS::idxToPos(const size_t idx, const int width)
+GpuPS::Position GpuPS::idxToPos(const size_t idx, const int width)
 {
     const int y = idx / width;
     const int x = idx % width;
-    return gpuPS::Position(x, y);
+    return GpuPS::Position(x, y);
 }
 
 __host__ __device__
-size_t gpuPS::posToIdx(const int width, const gpuPS::Position& pos)
+size_t GpuPS::posToIdx(const int width, const GpuPS::Position& pos)
 {
     return (pos.y * width) + pos.x;
 }
@@ -137,13 +137,13 @@ void dSubtractPSF(const float* dPsf,
     // lies in the work area actually do work
     if (x <= stopx && y <= stopy)
     {
-        dResidual[gpuPS::posToIdx(imageWidth, gpuPS::Position(x, y))] -= gain * absPeakVal
-            * dPsf[gpuPS::posToIdx(imageWidth, gpuPS::Position(x - diffx, y - diffy))];
+        dResidual[GpuPS::posToIdx(imageWidth, GpuPS::Position(x, y))] -= gain * absPeakVal
+            * dPsf[GpuPS::posToIdx(imageWidth, GpuPS::Position(x - diffx, y - diffy))];
     }
 }
 
 __host__
-void gpuPS::subtractPSF(const size_t peakPos,
+void GpuPS::subtractPSF(const size_t peakPos,
     const size_t psfPeakPos,
     const float absPeakVal)
 {
@@ -175,7 +175,7 @@ void gpuPS::subtractPSF(const size_t peakPos,
     gpuCheckErrors("kernel launch failure in subtractPSF");
 }
 
-void gpuPS::deconvolve()
+void GpuPS::deconvolve()
 {
     reportDevice();
 
@@ -225,7 +225,7 @@ void gpuPS::deconvolve()
 }
 
 __host__
-gpuPS::Peak gpuPS::findPeak(const float* dData, size_t N)
+GpuPS::Peak GpuPS::findPeak(const float* dData, size_t N)
 {
     const size_t SIZE_DATA = N * sizeof(float);
     const size_t SIZE_MAX_VALUE = GRID_SIZE * sizeof(float);
@@ -269,7 +269,7 @@ gpuPS::Peak gpuPS::findPeak(const float* dData, size_t N)
     return p;
 }
 
-void gpuPS::memAlloc()
+void GpuPS::memAlloc()
 {
     gpuMalloc(&dDirty, SIZE_IMAGE);
     gpuMalloc(&dPsf, SIZE_IMAGE);
@@ -277,7 +277,7 @@ void gpuPS::memAlloc()
     gpuCheckErrors("gpuMalloc failure");
 }
 
-gpuPS::~gpuPS()
+GpuPS::~GpuPS()
 {
     gpuFree(dDirty);
     gpuFree(dPsf);
@@ -286,7 +286,7 @@ gpuPS::~gpuPS()
     cout << "gpu PS destructor" << endl;
 }
 
-void gpuPS::copyH2D()
+void GpuPS::copyH2D()
 {
     gpuMemcpy(dDirty, dirty.data(), SIZE_IMAGE, gpuMemcpyHostToDevice);
     gpuMemcpy(dPsf, psf.data(), SIZE_IMAGE, gpuMemcpyHostToDevice);
@@ -294,7 +294,7 @@ void gpuPS::copyH2D()
     gpuCheckErrors("gpuMemcpy H2D failure");
 }
 
-void gpuPS::copyD2H()
+void GpuPS::copyD2H()
 {
     gpuMemcpy(residual.data(), dResidual, SIZE_IMAGE, gpuMemcpyDeviceToHost);
     gpuCheckErrors("gpuMemcpy D2H failure");

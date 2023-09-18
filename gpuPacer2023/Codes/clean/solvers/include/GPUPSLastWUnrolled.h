@@ -7,7 +7,7 @@
 #include <cmath>
 #include <iostream>
 
-class gpuPSLastWUnrolled : public IHogbom
+class GpuPSLastWUnrolled : public IHogbom
 {
 private:
 	// device vectors
@@ -62,14 +62,14 @@ private:
 			const float absPeakVal, const float gain);
 
 public:
-	gpuPSLastWUnrolled(const std::vector<float>& dirty,
+	GpuPSLastWUnrolled(const std::vector<float>& dirty,
 		const std::vector<float>& psf,
 		const size_t imageWidth,
 		std::vector<float>& model,
 		std::vector<float>& residual) : IHogbom(dirty, psf, imageWidth,
 			model, residual) {}
 
-	virtual ~gpuPSLastWUnrolled();
+	virtual ~GpuPSLastWUnrolled();
 
 	// Public methods
 	void deconvolve() override;

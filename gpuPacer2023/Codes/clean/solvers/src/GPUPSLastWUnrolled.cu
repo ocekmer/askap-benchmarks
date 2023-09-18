@@ -1,4 +1,4 @@
-#include "../include/GPUPSLastWUnrolled.h"
+#include "../include/GpuPSLastWUnrolled.h"
 
 using std::vector;
 using std::cout;
@@ -140,21 +140,21 @@ void dFindPeak_Step1_LW(const float* data, float* outMax, size_t* outIndex, size
 }
 
 __host__
-void gpuPSLastWUnrolled::reportDevice()
+void GpuPSLastWUnrolled::reportDevice()
 {
     //GPUReportDevice();
 }
 
 __host__ __device__
-gpuPSLastWUnrolled::Position gpuPSLastWUnrolled::idxToPos(const size_t idx, const int width)
+GpuPSLastWUnrolled::Position GpuPSLastWUnrolled::idxToPos(const size_t idx, const int width)
 {
     const int y = idx / width;
     const int x = idx % width;
-    return gpuPSLastWUnrolled::Position(x, y);
+    return GpuPSLastWUnrolled::Position(x, y);
 }
 
 __host__ __device__
-size_t gpuPSLastWUnrolled::posToIdx(const int width, const gpuPSLastWUnrolled::Position& pos)
+size_t GpuPSLastWUnrolled::posToIdx(const int width, const GpuPSLastWUnrolled::Position& pos)
 {
     return (pos.y * width) + pos.x;
 }
@@ -177,13 +177,13 @@ void dSubtractPSF_LW(const float* dPsf,
     // lies in the work area actually do work
     if (x <= stopx && y <= stopy)
     {
-        dResidual[gpuPSLastWUnrolled::posToIdx(imageWidth, gpuPSLastWUnrolled::Position(x, y))] -= gain * absPeakVal
-            * dPsf[gpuPSLastWUnrolled::posToIdx(imageWidth, gpuPSLastWUnrolled::Position(x - diffx, y - diffy))];
+        dResidual[GpuPSLastWUnrolled::posToIdx(imageWidth, GpuPSLastWUnrolled::Position(x, y))] -= gain * absPeakVal
+            * dPsf[GpuPSLastWUnrolled::posToIdx(imageWidth, GpuPSLastWUnrolled::Position(x - diffx, y - diffy))];
     }
 }
 
 __host__
-void gpuPSLastWUnrolled::subtractPSF(const size_t peakPos,
+void GpuPSLastWUnrolled::subtractPSF(const size_t peakPos,
     const size_t psfPeakPos,
     const float absPeakVal)
 {
@@ -215,7 +215,7 @@ void gpuPSLastWUnrolled::subtractPSF(const size_t peakPos,
     gpuCheckErrors("kernel launch failure in subtractPSF");
 }
 
-void gpuPSLastWUnrolled::deconvolve()
+void GpuPSLastWUnrolled::deconvolve()
 {
     reportDevice();
 
@@ -265,7 +265,7 @@ void gpuPSLastWUnrolled::deconvolve()
 }
 
 __host__
-gpuPSLastWUnrolled::Peak gpuPSLastWUnrolled::findPeak(const float* dData, size_t N)
+GpuPSLastWUnrolled::Peak GpuPSLastWUnrolled::findPeak(const float* dData, size_t N)
 {
     const size_t SIZE_DATA = N * sizeof(float);
     const size_t SIZE_MAX_VALUE = GRID_SIZE * sizeof(float);
@@ -309,7 +309,7 @@ gpuPSLastWUnrolled::Peak gpuPSLastWUnrolled::findPeak(const float* dData, size_t
     return p;
 }
 
-void gpuPSLastWUnrolled::memAlloc()
+void GpuPSLastWUnrolled::memAlloc()
 {
     gpuMalloc(&dDirty, SIZE_IMAGE);
     gpuMalloc(&dPsf, SIZE_IMAGE);
@@ -317,7 +317,7 @@ void gpuPSLastWUnrolled::memAlloc()
     gpuCheckErrors("gpuMalloc failure");
 }
 
-gpuPSLastWUnrolled::~gpuPSLastWUnrolled()
+GpuPSLastWUnrolled::~GpuPSLastWUnrolled()
 {
     gpuFree(dDirty);
     gpuFree(dPsf);
@@ -326,7 +326,7 @@ gpuPSLastWUnrolled::~gpuPSLastWUnrolled()
     cout << "gpu PS Full Unroll destructor" << endl;
 }
 
-void gpuPSLastWUnrolled::copyH2D()
+void GpuPSLastWUnrolled::copyH2D()
 {
     gpuMemcpy(dDirty, dirty.data(), SIZE_IMAGE, gpuMemcpyHostToDevice);
     gpuMemcpy(dPsf, psf.data(), SIZE_IMAGE, gpuMemcpyHostToDevice);
@@ -334,7 +334,7 @@ void gpuPSLastWUnrolled::copyH2D()
     gpuCheckErrors("gpuMemcpy H2D failure");
 }
 
-void gpuPSLastWUnrolled::copyD2H()
+void GpuPSLastWUnrolled::copyD2H()
 {
     gpuMemcpy(residual.data(), dResidual, SIZE_IMAGE, gpuMemcpyDeviceToHost);
     gpuCheckErrors("gpuMemcpy D2H failure");

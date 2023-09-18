@@ -7,7 +7,7 @@
 #include <cmath>
 #include <iostream>
 
-class gpuPS : public IHogbom
+class GpuPS : public IHogbom
 {
 private:
 	// device vectors
@@ -62,14 +62,14 @@ private:
 			const float absPeakVal, const float gain);
 
 public:
-	gpuPS(const std::vector<float>& dirty,
+	GpuPS(const std::vector<float>& dirty,
 		const std::vector<float>& psf,
 		const size_t imageWidth,
 		std::vector<float>& model,
 		std::vector<float>& residual) : IHogbom(dirty, psf, imageWidth,
 			model, residual) {}
 
-	virtual ~gpuPS();
+	virtual ~GpuPS();
 
 	// Public methods
 	void deconvolve() override;

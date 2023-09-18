@@ -1,4 +1,4 @@
-#include "../include/GPUOlder.h"
+#include "../include/GpuOlder.h"
 
 using std::vector;
 using std::cout;
@@ -22,21 +22,21 @@ static Peak findPeak(const float* dData, size_t N);
 
 
 __host__
-void gpuOlder::reportDevice()
+void GpuOlder::reportDevice()
 {
 //    GPUReportDevice();
 }
 
 __host__ __device__
-gpuOlder::Position gpuOlder::idxToPos(const size_t idx, const int width)
+GpuOlder::Position GpuOlder::idxToPos(const size_t idx, const int width)
 {
     const int y = idx / width;
     const int x = idx % width;
-    return gpuOlder::Position(x, y);
+    return GpuOlder::Position(x, y);
 }
 
 __host__ __device__
-size_t gpuOlder::posToIdx(const int width, const gpuOlder::Position& pos)
+size_t GpuOlder::posToIdx(const int width, const GpuOlder::Position& pos)
 {
     return (pos.y * width) + pos.x;
 }
@@ -58,8 +58,8 @@ void dSubtractPSF_Older(const float* dPsf,
     // lies in the work area actually do work
     if (x <= stopx && y <= stopy)
     {
-        dResidual[gpuOlder::posToIdx(imageWidth, gpuOlder::Position(x, y))] -= gain * absPeakVal
-            * dPsf[gpuOlder::posToIdx(imageWidth, gpuOlder::Position(x - diffx, y - diffy))];
+        dResidual[GpuOlder::posToIdx(imageWidth, GpuOlder::Position(x, y))] -= gain * absPeakVal
+            * dPsf[GpuOlder::posToIdx(imageWidth, GpuOlder::Position(x - diffx, y - diffy))];
     }
 }
 
@@ -99,7 +99,7 @@ void dFindPeak(const float* image, size_t size, Peak* absPeak)
 }
 
 __host__
-void gpuOlder::subtractPSF(const size_t peakPos,
+void GpuOlder::subtractPSF(const size_t peakPos,
     const size_t psfPeakPos,
     const float absPeakVal)
 {
@@ -131,7 +131,7 @@ void gpuOlder::subtractPSF(const size_t peakPos,
     gpuCheckErrors("kernel launch failure in subtractPSF");
 }
 
-void gpuOlder::deconvolve()
+void GpuOlder::deconvolve()
 {
     reportDevice();
 
@@ -224,7 +224,7 @@ Peak findPeak(const float* dData, size_t N)
     return p;
 }
 
-void gpuOlder::memAlloc()
+void GpuOlder::memAlloc()
 {
     gpuMalloc(&dDirty, SIZE_IMAGE);
     gpuMalloc(&dPsf, SIZE_IMAGE);
@@ -232,7 +232,7 @@ void gpuOlder::memAlloc()
     gpuCheckErrors("gpuMalloc failure");
 }
 
-gpuOlder::~gpuOlder()
+GpuOlder::~GpuOlder()
 {
     gpuFree(dDirty);
     gpuFree(dPsf);
@@ -240,7 +240,7 @@ gpuOlder::~gpuOlder()
     gpuCheckErrors("gpuFree failure");
 }
 
-void gpuOlder::copyH2D()
+void GpuOlder::copyH2D()
 {
     gpuMemcpy(dDirty, dirty.data(), SIZE_IMAGE, gpuMemcpyHostToDevice);
     gpuMemcpy(dPsf, psf.data(), SIZE_IMAGE, gpuMemcpyHostToDevice);
@@ -248,7 +248,7 @@ void gpuOlder::copyH2D()
     gpuCheckErrors("gpuMemcpy H2D failure");
 }
 
-void gpuOlder::copyD2H()
+void GpuOlder::copyD2H()
 {
     gpuMemcpy(residual.data(), dResidual, SIZE_IMAGE, gpuMemcpyDeviceToHost);
     gpuCheckErrors("gpuMemcpy D2H failure");

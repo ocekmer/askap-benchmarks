@@ -7,7 +7,7 @@
 #include <cmath>
 #include <iostream>
 
-class gpuOlder : public IHogbom
+class GpuOlder : public IHogbom
 {
 private:
 	// device vectors
@@ -59,14 +59,14 @@ private:
 			const float absPeakVal, const float gain);
 
 public:
-	gpuOlder(const std::vector<float>& dirty,
+	GpuOlder(const std::vector<float>& dirty,
 		const std::vector<float>& psf,
 		const size_t imageWidth,
 		std::vector<float>& model,
 		std::vector<float>& residual) : IHogbom(dirty, psf, imageWidth,
 			model, residual) {}
 
-	virtual ~gpuOlder();
+	virtual ~GpuOlder();
 
 	
 	// Public methods
@@ -75,7 +75,3 @@ public:
 
 };
 
-class naber
-{
-	
-};
