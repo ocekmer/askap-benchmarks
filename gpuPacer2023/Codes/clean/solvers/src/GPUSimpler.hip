@@ -1,4 +1,4 @@
-#include "../include/GpuSimpler.h"
+#include "../include/GPUSimpler.h"
 
 using std::vector;
 using std::cout;
@@ -123,7 +123,7 @@ void dSubtractPSF_Simpler(const float* dPsf,
 }
 
 __host__
-void GpuSimpler::subtractPSF(const size_t peakPos,
+void GPUSimpler::subtractPSF(const size_t peakPos,
     const size_t psfPeakPos,
     const float absPeakVal)
 {
@@ -156,7 +156,7 @@ void GpuSimpler::subtractPSF(const size_t peakPos,
 }
 
 __host__
-void GpuSimpler::subtractPSF2(const int &px, const int &py, const size_t &peakPos,
+void GPUSimpler::subtractPSF2(const int &px, const int &py, const size_t &peakPos,
     const float &absPeakVal)
 {
     const int blockDim = 16;
@@ -191,7 +191,7 @@ void GpuSimpler::subtractPSF2(const int &px, const int &py, const size_t &peakPo
     gpuCheckErrors("kernel launch failure in subtractPSF");
 }
 
-void GpuSimpler::deconvolve()
+void GPUSimpler::deconvolve()
 {
     reportDevice();
 
@@ -265,7 +265,7 @@ void GpuSimpler::deconvolve()
 }
 
 __host__
-void GpuSimpler::findPeak(float* dMax, size_t* dIndex, size_t* d2Index, float& peakValue, size_t& peakPos, const float* dData, size_t N)
+void GPUSimpler::findPeak(float* dMax, size_t* dIndex, size_t* d2Index, float& peakValue, size_t& peakPos, const float* dData, size_t N)
 {
     
     // Host vector for max values
@@ -290,7 +290,7 @@ void GpuSimpler::findPeak(float* dMax, size_t* dIndex, size_t* d2Index, float& p
     
 }
 
-void GpuSimpler::memAlloc()
+void GPUSimpler::memAlloc()
 {
     gpuMalloc(&dDirty, SIZE_IMAGE);
     gpuMalloc(&dPsf, SIZE_IMAGE);
@@ -298,7 +298,7 @@ void GpuSimpler::memAlloc()
     gpuCheckErrors("gpuMalloc failure");
 }
 
-GpuSimpler::~GpuSimpler()
+GPUSimpler::~GPUSimpler()
 {
     gpuFree(dDirty);
     gpuFree(dPsf);
@@ -306,7 +306,7 @@ GpuSimpler::~GpuSimpler()
     gpuCheckErrors("gpuFree failure");
 }
 
-void GpuSimpler::copyH2D()
+void GPUSimpler::copyH2D()
 {
     gpuMemcpy(dDirty, dirty.data(), SIZE_IMAGE, gpuMemcpyHostToDevice);
     gpuMemcpy(dPsf, psf.data(), SIZE_IMAGE, gpuMemcpyHostToDevice);
@@ -314,7 +314,7 @@ void GpuSimpler::copyH2D()
     gpuCheckErrors("gpuMemcpy H2D failure");
 }
 
-void GpuSimpler::copyD2H()
+void GPUSimpler::copyD2H()
 {
     gpuMemcpy(residual.data(), dResidual, SIZE_IMAGE, gpuMemcpyDeviceToHost);
     gpuCheckErrors("gpuMemcpy D2H failure");

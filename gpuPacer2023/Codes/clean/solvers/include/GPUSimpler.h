@@ -7,7 +7,7 @@
 #include <cmath>
 #include <iostream>
 
-class GpuSimpler : public IHogbom
+class GPUSimpler : public IHogbom
 {
 private:
 	// device vectors
@@ -44,14 +44,14 @@ private:
 			const float absPeakVal, const float gain);
 
 public:
-	GpuSimpler(const std::vector<float>& dirty,
+	GPUSimpler(const std::vector<float>& dirty,
 		const std::vector<float>& psf,
 		const size_t imageWidth,
 		std::vector<float>& model,
 		std::vector<float>& residual) : IHogbom(dirty, psf, imageWidth,
 			model, residual) {}
 
-	virtual ~GpuSimpler();
+	virtual ~GPUSimpler();
 
 	// Public methods
 	void deconvolve() override;

@@ -84,8 +84,6 @@ void Hello::hello() const
             }
         }
 
-
-
     }
 }
 
