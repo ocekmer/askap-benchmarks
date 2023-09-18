@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../interface/IHogbom.h"
-#include "../../utilities/include/LoggerUtil.h"
+//#include "../../utilities/include/LoggerUtil.h"
 #include "../../utilities/include/GpuCommon.h"
 
 #include <cmath>

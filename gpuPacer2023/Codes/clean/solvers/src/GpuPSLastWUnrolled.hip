@@ -230,7 +230,8 @@ void GpuPSLastWUnrolled::deconvolve()
     // Find peak of psf
     Peak psfPeak = findPeak(dPsf, psf.size());
 
-    LocalLog() << "Found peak of PSF: " << "Maximum = " << psfPeak.val
+    //LocalLog() << "Found peak of PSF: " << "Maximum = " << psfPeak.val
+    cout << "Found peak of PSF: " << "Maximum = " << psfPeak.val
         << " at location " << idxToPos(psfPeak.pos, imageWidth).x << ","
         << idxToPos(psfPeak.pos, imageWidth).y << endl;
 
@@ -240,7 +241,8 @@ void GpuPSLastWUnrolled::deconvolve()
         Peak peak = findPeak(dResidual, residual.size());
         if ((i + 1) % 100 == 0 || i == 0)
         {
-            LocalLog() << "Iteration: " << i + 1 << " - Maximum = " << peak.val
+            //LocalLog() << "Iteration: " << i + 1 << " - Maximum = " << peak.val
+            cout << "Iteration: " << i + 1 << " - Maximum = " << peak.val
                 << " at location " << idxToPos(peak.pos, imageWidth).x << ","
                 << idxToPos(peak.pos, imageWidth).y << ", index = " << peak.pos << endl;
         }
@@ -248,7 +250,8 @@ void GpuPSLastWUnrolled::deconvolve()
         // Check if threshold has been reached
         if (abs(peak.val) < gThreshold)
         {
-            LocalLog() << "Reached stopping threshold" << endl;
+            //LocalLog() << "Reached stopping threshold" << endl;
+            cout << "Reached stopping threshold" << endl;
             break;
         }
 

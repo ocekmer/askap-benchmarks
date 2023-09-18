@@ -3,7 +3,7 @@
 // Utilities
 #include "MaxError.h"
 #include "GpuCommon.h"
-#include "LoggerUtil.h"
+//#include "LoggerUtil.h"
 
 // Standard libs
 #include <vector>

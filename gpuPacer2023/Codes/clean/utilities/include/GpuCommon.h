@@ -108,7 +108,7 @@ do{                                                                             
     gpuDeviceProp_t devprop; \
     gpuGetDevice(&device); \
     gpuGetDeviceProperties(&devprop, device); \
-    //std::cout << "[@" << __func__ << " L" << __LINE__ << "] :" << "Using " << __GPU_API__ << " Device " << device << ": " << devprop.name << std::endl; \
+    std::cout << "[@" << __func__ << " L" << __LINE__ << "] :" << "Using " << __GPU_API__ << " Device " << device << ": " << devprop.name << std::endl; \
     }
 
 
