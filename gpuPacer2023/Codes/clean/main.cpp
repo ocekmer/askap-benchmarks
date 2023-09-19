@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
 	const size_t PSF_DIM = imagProc.checkSquare(psf);
 	auto t1 = omp_get_wtime();
 	auto runtimeImagProc = t1 - t0;
-	LogTimeTaken(timer);
+	//LogTimeTaken(timer);
 
 	if (PSF_DIM != DIRTY_DIM)
 	{

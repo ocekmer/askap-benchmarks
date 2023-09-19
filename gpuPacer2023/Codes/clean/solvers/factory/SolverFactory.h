@@ -6,9 +6,9 @@
 #include "../interface/IHogbom.h"
 #include "../include/Golden.h"
 #include "../include/GoldenSimpler.h"
-#include "../include/OpenMP.h"
-#include "../include/OpenMPOld.h"
-#include "../include/OpenMPNew.h"
+//#include "../include/OpenMP.h"
+//#include "../include/OpenMPOld.h"
+//#include "../include/OpenMPNew.h"
 #include "../include/GpuPS.h"
 #include "../include/GpuPSLastWUnrolled.h"
 #include "../include/GpuPSFullUnroll.h"
@@ -45,6 +45,7 @@ public:
 			solverSelect = std::make_shared<GoldenSimpler>(dirty, psf, imageWidth,
 					model, residual);
 		}
+		/*
 		else if (solverType == "openMP")
 		{
 			solverSelect = std::make_shared<OpenMP>(dirty, psf, imageWidth,
@@ -60,6 +61,7 @@ public:
 			solverSelect = std::make_shared<OpenMPNew>(dirty, psf, imageWidth,
 					model, residual);
 		}
+		*/
 		else if (solverType == "gpuOlder")
 		{
 			solverSelect = std::make_shared<GpuOlder>(dirty, psf, imageWidth,

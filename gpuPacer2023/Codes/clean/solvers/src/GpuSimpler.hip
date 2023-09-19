@@ -193,7 +193,7 @@ void GpuSimpler::subtractPSF2(const int &px, const int &py, const size_t &peakPo
 
 void GpuSimpler::deconvolve()
 {
-    reportDevice();
+//    reportDevice();
 
     residual = dirty;
 
