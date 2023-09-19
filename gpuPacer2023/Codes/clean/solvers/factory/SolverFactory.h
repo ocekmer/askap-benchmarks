@@ -9,6 +9,7 @@
 //#include "../include/OpenMP.h"
 //#include "../include/OpenMPOld.h"
 //#include "../include/OpenMPNew.h"
+#include "../include/GpuThrust.h"
 #include "../include/GpuPS.h"
 #include "../include/GpuPSLastWUnrolled.h"
 #include "../include/GpuPSFullUnroll.h"
@@ -62,6 +63,11 @@ public:
 					model, residual);
 		}
 		*/
+		else if (solverType == "thrust")
+		{
+			solverSelect = std::make_shared<GpuThrust>(dirty, psf, imageWidth,
+				model, residual);
+		}
 		else if (solverType == "gpuOlder")
 		{
 			solverSelect = std::make_shared<GpuOlder>(dirty, psf, imageWidth,
