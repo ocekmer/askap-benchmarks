@@ -51,7 +51,7 @@ void dFindPeak_Step2_Simpler(float* data, size_t* inIndex, size_t* outIndex, siz
 }
 
 __global__
-void dFindPeak_Step1_Simpler(const float* data, float* outMax, size_t* outIndex, size_t n)
+void dFindPeak_Step1_Simpler(float* data, float* outMax, size_t* outIndex, size_t n)
 {
     __shared__ float TILE_VAL[BLOCK_SIZE];
     __shared__ size_t TILE_IDX[BLOCK_SIZE];
@@ -101,7 +101,7 @@ void dFindPeak_Step1_Simpler(const float* data, float* outMax, size_t* outIndex,
 }
 
 __global__
-void dSubtractPSF_Simpler(const float* dPsf,
+void dSubtractPSF_Simpler(float* dPsf,
     float* dResidual,
     const int imageWidth,
     const int startx, const int starty,
@@ -205,15 +205,18 @@ void GpuSimpler::deconvolve()
 
     const size_t SIZE_MAX_VALUE = GRID_SIZE * sizeof(float);
     const size_t SIZE_MAX_INDEX = GRID_SIZE * sizeof(size_t);
+    cout<<SIZE_MAX_VALUE<<" "<<SIZE_MAX_INDEX<<" "<<imageWidth<<std::endl;
 
     // Device vectors
     float* dMax;
     size_t* dIndex;
     size_t* d2Index;
 
+    auto timer = NewTimer();
     gpuMalloc(&dMax, SIZE_MAX_VALUE);
     gpuMalloc(&dIndex, SIZE_MAX_INDEX);
     gpuMalloc(&d2Index, sizeof(size_t));
+    LogTimeTakenOnDevice(timer);
     gpuCheckErrors("gpuMalloc failure!");
 
     // Find peak of psf
@@ -233,6 +236,7 @@ void GpuSimpler::deconvolve()
         // Find peak in the residual image
         peakVal = 0.0;
         peakPos = 0;
+
         findPeak(dMax, dIndex, d2Index, peakVal, peakPos, dResidual, residual.size());
         if ((i + 1) % 100 == 0 || i == 0)
         {
@@ -265,7 +269,7 @@ void GpuSimpler::deconvolve()
 }
 
 __host__
-void GpuSimpler::findPeak(float* dMax, size_t* dIndex, size_t* d2Index, float& peakValue, size_t& peakPos, const float* dData, size_t N)
+void GpuSimpler::findPeak(float* dMax, size_t* dIndex, size_t* d2Index, float& peakValue, size_t& peakPos, float* dData, size_t N)
 {
     
     // Host vector for max values
@@ -292,25 +296,31 @@ void GpuSimpler::findPeak(float* dMax, size_t* dIndex, size_t* d2Index, float& p
 
 void GpuSimpler::memAlloc()
 {
+    auto timer = NewTimer();
     gpuMalloc(&dDirty, SIZE_IMAGE);
     gpuMalloc(&dPsf, SIZE_IMAGE);
     gpuMalloc(&dResidual, SIZE_IMAGE);
+    LogTimeTakenOnDevice(timer);
     gpuCheckErrors("gpuMalloc failure");
 }
 
 GpuSimpler::~GpuSimpler()
 {
+    auto timer = NewTimer()
     gpuFree(dDirty);
     gpuFree(dPsf);
     gpuFree(dResidual);
+    LogTimeTakenOnDevice(timer);
     gpuCheckErrors("gpuFree failure");
 }
 
 void GpuSimpler::copyH2D()
 {
+    auto timer = NewTimer()
     gpuMemcpy(dDirty, dirty.data(), SIZE_IMAGE, gpuMemcpyHostToDevice);
     gpuMemcpy(dPsf, psf.data(), SIZE_IMAGE, gpuMemcpyHostToDevice);
     gpuMemcpy(dResidual, residual.data(), SIZE_IMAGE, gpuMemcpyHostToDevice);
+    LogTimeTakenOnDevice(timer);
     gpuCheckErrors("gpuMemcpy H2D failure");
 }
 

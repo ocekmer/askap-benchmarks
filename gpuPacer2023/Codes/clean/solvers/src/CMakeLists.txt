@@ -2,7 +2,8 @@
 add_library (SourceCodeCMake 
     Golden.cpp 
     GoldenSimpler.cpp
-    #OpenMP.cpp
+    GpuThrust.hip
+    OpenMP.cpp
     #OpenMPOld.cpp
     #OpenMPNew.cpp
     GpuSimpler.hip

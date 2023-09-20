@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../interface/IHogbom.h"
-//#include "../../utilities/include/LoggerUtil.h"
+#include "../../utilities/include/LoggerUtil.h"
 #include "../../utilities/include/GpuCommon.h"
 
 #include <cmath>
@@ -21,12 +21,15 @@ private:
 
 	// Private methods
 	__host__
-		void findPeak(float* dMax, size_t* dIndex, size_t* d2Index, float& peakValue, size_t& peakPos, const float* dData, size_t N);
+		void findPeak(float* dMax, size_t* dIndex, size_t* d2Index, float& peakValue, size_t& peakPos, float* dData, size_t N);
 
-	void subtractPSF(const size_t peakPos,
+	void subtractPSF(
+		const size_t peakPos,
 		const size_t psfPeakPos,
 		const float absPeakVal) override;
-	void subtractPSF2(const int &px, const int &py, const size_t &peakPos,
+	void subtractPSF2(
+		const int &px, const int &py, 
+		const size_t &peakPos,
 		const float &absPeakVal);
 
 	void memAlloc();
@@ -35,7 +38,7 @@ private:
 
 	friend
 		__global__
-		void dSubtractPSF_Simpler(const float* dPsf,
+		void dSubtractPSF_Simpler(float* dPsf,
 			float* dResidual,
 			const int imageWidth,
 			const int startx, const int starty,

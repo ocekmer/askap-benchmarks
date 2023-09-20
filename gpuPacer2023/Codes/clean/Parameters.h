@@ -3,21 +3,34 @@
 #include <string>
 #include <iostream>
 
-static const int IMAGE_WIDTH = 4096;
+/*
+extern std::string gDirtyFile, gPsfFile;
 
-static const std::string gDirtyFile = "../data/dirty_" + std::to_string(IMAGE_WIDTH) + ".img";
-static const std::string gPsfFile = "../data/psf_" + std::to_string(IMAGE_WIDTH) + ".img";
+extern size_t gNiters;
+extern float gGain, gThreshold;
 
-//static const size_t gNiters = 1000;
-static const size_t gNiters = 1;
-static const float gGain = 0.1;
-static const float gThreshold = 0.00001;
-
-static const int BLOCK_SIZE = 128; // CUDA maximum is 1024
-static const int GRID_SIZE = 512;
+extern int BLOCK_SIZE, GRID_SIZE;
 
 // Solver selection
-static const std::string refSolverName = "cpu";
+extern std::string refSolverName, testSolverName;
+*/
+
+static const int inputbase = 4096;
+static const std::string gDirtyFile = "../data/dirty_" + std::to_string(inputbase) + ".img";
+static const std::string gPsfFile = "../data/psf_" + std::to_string(inputbase) + ".img";
+
+// static const size_t gNiters = 1;
+// static const float gGain = 0.1;
+// static const float gThreshold = 0.00001;
+
+extern size_t gNiters;
+extern float gGain, gThreshold;
+
+static const int BLOCK_SIZE = 512, GRID_SIZE = 128;
+
+// Solver selection
+static const std::string refSolverName = "thrust";
+// static const std::string refSolverName = "cpu";
 static const std::string testSolverName = "gpuSimpler";
 
 /*

@@ -57,12 +57,13 @@ endif()
 
 #find_package(MPI REQUIRED)
 #message(STATUS "Run: ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS} ${MPIEXEC_PREFLAGS} EXECUTABLE ${MPIEXEC_POSTFLAGS} ARGS")
-set(CMAKE_CXX_COMPILER "hipcc")
+#set(CMAKE_CXX_COMPILER "hipcc")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} ${MPI_CXX_FLAGS} -I/opt/cray/pe/mpich/8.1.25/ofi/gnu/9.1/include -L/opt/cray/pe/mpich/8.1.25/ofi/gnu/9.1/lib -L/opt/cray/pe/mpich/8.1.25/gtl/lib -DMPICH_GPU_SUPPORT_ENABLED=1 --target=x86_64-pc-linux-gnu -O2")
 #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lmpi_gtl_hsa -lmpi -I/opt/cray/xpmem/2.5.2-2.4_3.47__gd0f7936.shasta/include -L/opt/cray/xpmem/2.5.2-2.4_3.47__gd0f7936.shasta/lib64/ -Wl,--no-as-needed -lxpmem")
 #target_link_libraries(askap PUBLIC MPI::MPI_CXX)
 
 # add the include library
+#add_subdirectory("profile_util")
 add_subdirectory("utilities/src")
 add_subdirectory("solvers/src")
 

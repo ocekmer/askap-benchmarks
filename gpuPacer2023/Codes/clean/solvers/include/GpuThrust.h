@@ -1,10 +1,12 @@
 #pragma once
 
 #include "../interface/IHogbom.h"
-//#include "../../utilities/include/LoggerUtil.h"
+#include "../../utilities/include/LoggerUtil.h"
 #include "../../utilities/include/GpuCommon.h"
 #include <thrust/extrema.h>
 #include <thrust/execution_policy.h>
+#include <thrust/device_vector.h>
+#include <thrust/host_vector.h>
 
 #include <cmath>
 #include <iostream>
@@ -13,13 +15,22 @@ class GpuThrust : public IHogbom
 {
 private:
 	// Private methods
-	void findPeak(const std::vector<float>& image, float& maxVal, size_t& maxPos);
-	void subtractPSF(const size_t peakPos,
+	// void findPeak(const std::vector<float>& image, float& maxVal, size_t& maxPos);
+	// void subtractPSF(const size_t peakPos,
+	// 	const size_t psfPeakPos,
+	// 	const float absPeakVal) override;
+	void findPeak(
+		thrust::device_vector<float> & image_D, 
+		float& maxVal, 
+		size_t& maxPos);
+	void subtractPSF(
+		const size_t peakPos,
 		const size_t psfPeakPos,
 		const float absPeakVal) override;
 
 public:
-	GpuThrust(const std::vector<float>& dirty,
+	GpuThrust(
+		const std::vector<float>& dirty,
 		const std::vector<float>& psf,
 		const size_t imageWidth,
 		std::vector<float>& model,

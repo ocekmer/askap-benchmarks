@@ -330,7 +330,7 @@ namespace logger_util {
             gpuErrorCheck(gpuEventSynchronize(t1_event));
             float telapsed;
             gpuErrorCheck(gpuEventElapsedTime(&telapsed,t0_event,t1_event));
-            telapsed *= _GPU_TO_SECONDS; // to convert to seconds 
+            telapsed *= __GPU_TO_SECONDS__*1e6; // to convert to seconds 
             gpuErrorCheck(gpuEventDestroy(t1_event));
             return telapsed;
         }

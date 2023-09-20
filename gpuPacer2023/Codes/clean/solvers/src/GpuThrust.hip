@@ -1,4 +1,6 @@
 #include "../include/GpuThrust.h"
+#include <algorithm>
+#include <iterator>
 
 using std::cout;
 using std::endl;
@@ -7,27 +9,24 @@ using std::min;
 using std::abs;
 using std::vector;
 
-void GpuThrust::findPeak(const vector<float>& image, float& maxVal, size_t& maxPos)
+
+struct device_fabs
 {
-	maxVal = 0.0;
-	maxPos = 0;
-	const size_t SIZE = image.size();
+  __host__ __device__
+  bool operator()(float lhs, float rhs)
+  {
+    return fabs(lhs) < fabs(rhs);
+  }
+};
 
-    float *result = thrust::max_element(thrust::host, image.data(), image.data() + SIZE);
+void GpuThrust::findPeak(
+	thrust::device_vector<float> & image_D, 
+	float& maxVal, 
+	size_t& maxPos)
+{
+    auto result = thrust::max_element(thrust::device, image_D.begin(), image_D.end(), device_fabs());
+    maxPos = thrust::distance(image_D.begin(), result);
     maxVal = *result;
-    maxPos = result;
-
-
-/*
-	for (auto i = 0; i < SIZE; ++i)
-	{
-		if (abs(image[i]) > abs(maxVal))
-		{
-			maxVal = image[i];
-			maxPos = i;
-		}
-	}
-*/
 }
 
 void GpuThrust::subtractPSF(const size_t peakPos,
@@ -66,7 +65,12 @@ void GpuThrust::deconvolve()
 	// Find the peak of the PSF
 	float psfPeakVal = 0.0;
 	size_t psfPeakPos = 0;
-	findPeak(psf, psfPeakVal, psfPeakPos);
+	auto timer = NewTimer();
+	thrust::device_vector<float> image_D = dirty;
+	thrust::device_vector<float> psf_D = psf;
+	thrust::device_vector<float> residual_D = dirty;
+	LogTimeTakenOnDevice(timer);
+	findPeak(psf_D, psfPeakVal, psfPeakPos);
 
     cout << "PSF peak: " << psfPeakVal << ", at location: " << psfPeakPos % imageWidth << ", " 
         << psfPeakPos / imageWidth << endl;
@@ -76,7 +80,7 @@ void GpuThrust::deconvolve()
 		// Find the peak in the residual image
 		float absPeakVal = 0.0;
 		size_t absPeakPos = 0;
-		findPeak(residual, absPeakVal, absPeakPos);
+		findPeak(residual_D, absPeakVal, absPeakPos);
 
 		if ((i + 1) % 100 == 0 || i == 0)
 		{

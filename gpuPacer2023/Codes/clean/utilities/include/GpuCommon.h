@@ -6,6 +6,7 @@
 
 #include <iostream>
 
+#define _GPU
 #ifdef USEHIP
 #define __GPU_API__ "HIP"
 #define __GPU_TO_SECONDS__ 1.0/1000.0

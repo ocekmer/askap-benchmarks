@@ -39,7 +39,7 @@ size_t ImageProcess::checkSquare(vector<float>& vec)
     const size_t SINGLE_DIM = sqrt(SIZE);
     if (SINGLE_DIM * SINGLE_DIM != SIZE)
     {
-        cerr << "Error: Image is not square" << endl;
+        cerr << "Error: Image is not square" << SIZE<< " "<<SINGLE_DIM<<endl;
         exit(-1);
     }
 

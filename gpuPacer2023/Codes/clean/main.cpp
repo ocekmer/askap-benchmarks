@@ -7,12 +7,27 @@
 
 #include "Parameters.h"
 
+
+// const int inputbase = 4096;
+// std::string gDirtyFile = "../data/dirty_" + std::to_string(inputbase) + ".img";
+// std::string gPsfFile = "../data/psf_" + std::to_string(inputbase) + ".img";
+
+size_t gNiters = 10;
+float gGain = 0.1;
+float gThreshold = 0.00001;
+
+// int BLOCK_SIZE = 512, GRID_SIZE = 128;
+
+// Solver selection
+// std::string refSolverName = "thrust";
+// std::string testSolverName = "gpuSimpler";
+
 #include "utilities/include/ImageProcess.h"
 #include "utilities/include/MaxError.h"
 #include "utilities/include/WarmupGPU.h"
 #include "utilities/include/WarmupSetup.h"
 #include "utilities/include/GpuCommon.h"
-//#include "utilities/include/LoggerUtil.h"
+#include "utilities/include/LoggerUtil.h"
 #include "utilities/include/Hello.h"
 #include "solvers/interface/IHogbom.h"
 #include "solvers/factory/SolverFactory.h"
@@ -41,11 +56,10 @@ int main(int argc, char *argv[])
 
     Hello hello(size, rank, name);
     hello.hello();   
-
+*/
 	// report the parellelism and affinity
 	LogParallelAPI();
 	LogBinding();
-*/
 
 	// Maximum error evaluator
 	MaxError<float> maximumError;
@@ -54,18 +68,43 @@ int main(int argc, char *argv[])
 	ImageProcess imagProc;
 
 	// Load dirty image and psf
-	//float runtimeImagProc = 0.0;
-	//auto timer = NewTimerHostOnly();
-	auto t0 = omp_get_wtime();
-//	LocalLog() << "Reading dirty image & psf image" << endl;
-	cout << "Reading dirty image & psf image" << endl;
+	float runtimeImagProc = 0.0;
+	auto timer = NewTimerHostOnly();
+	LocalLog() << "Reading dirty image & psf image" << endl;
 	vector<float> dirty = imagProc.readImage(gDirtyFile);
 	vector<float> psf = imagProc.readImage(gPsfFile);
+	// lets tile the image to that it is larger, try 4x4 tilling
+	int ntile = 1;
+	if (argc >= 2) {
+		ntile = atoi(argv[1]);
+	}
+	if (argc >= 3) {
+		gNiters = atoi(argv[2]);
+	}
+	int dgrid = std::sqrt(dirty.size());
+	vector<float> newdirty(dirty.size()*ntile*ntile);
+	vector<float> newpsf(newdirty.size());
+	for (auto i=0;i<ntile;i++) {
+		for (auto j=0;j<ntile;j++) {
+			auto offset = i*dgrid*dgrid+j*dgrid;
+			for (auto ii = 0; ii < dgrid; ii++) {
+				for (auto jj=0; jj < dgrid; jj++) {
+					auto index = ii * dgrid + jj;
+					auto index2 = (i*ntile*dgrid+ii)*dgrid + (j*ntile*dgrid+jj);
+					newdirty[index2] = dirty[index];
+					newpsf[index2] = psf[index];
+				}
+			}
+		}
+	}
+	dirty = newdirty;
+	psf = newpsf;
 	const size_t DIRTY_DIM = imagProc.checkSquare(dirty);
 	const size_t PSF_DIM = imagProc.checkSquare(psf);
-	auto t1 = omp_get_wtime();
-	auto runtimeImagProc = t1 - t0;
-	//LogTimeTaken(timer);
+
+	// lets tile the image to that it is larger, try 4x4 tilling
+	 
+	LogTimeTaken(timer);
 
 	if (PSF_DIM != DIRTY_DIM)
 	{
@@ -76,10 +115,8 @@ int main(int argc, char *argv[])
 	const size_t IMAGE_DIM = DIRTY_DIM;
 
 	// Reports some parameters
-	//LocalLog() << "Iterations: " << gNiters << endl;
-	//LocalLog() << "Image dimension: " << DIRTY_DIM << " x " << DIRTY_DIM << endl;
-	cout << "Iterations: " << gNiters << endl;
-	cout << "Image dimension: " << DIRTY_DIM << " x " << DIRTY_DIM << endl;
+	LocalLog() << "Iterations: " << gNiters << endl;
+	LocalLog() << "Image dimension: " << DIRTY_DIM << " x " << DIRTY_DIM << endl;
 
 	// WARMUP
 	WarmupGPU warmupGPU;
@@ -93,17 +130,14 @@ int main(int argc, char *argv[])
 	// REFERENCE SOLVER
 	vector<float> refResidual(dirty.size(), 0.0);
 	vector<float> refModel(dirty.size(), 0.0);
-	//float runtimeRef = 0.0;
-	//LocalLog() << "Solver: " << refSolverName << endl;
-	cout << "Solver: " << refSolverName << endl;
+	float runtimeRef = 0.0;
+	LocalLog() << "Solver: " << refSolverName << endl;
 	SolverFactory refSolverFactory(dirty, psf, IMAGE_DIM, refModel, refResidual);
 	std::shared_ptr<IHogbom> hogbom = refSolverFactory.getSolver(refSolverName);
-	//timer = NewTimerHostOnly();
-	t0 = omp_get_wtime();
+	timer = NewTimerHostOnly();
 	hogbom->deconvolve();
-	t1 = omp_get_wtime();
-	auto runtimeRef = t1 - t0;
-	//runtimeRef = timer.get() * 1e-6;
+	runtimeRef = timer.get() * 1e-6;
+	LogTimeTaken(timer);
 	
 	// WARMUP
 	if ((!refGPU) && testGPU)
@@ -115,42 +149,29 @@ int main(int argc, char *argv[])
 	// NEW SOLVER TEST
 	vector<float> testResidual(dirty.size(), 0.0);
 	vector<float> testModel(dirty.size(), 0.0);
-	//float runtimeTest = 0.0;
-	//LocalLog() << "Solver: " << testSolverName << endl;
-	cout << "Solver: " << testSolverName << endl;
+	float runtimeTest = 0.0;
+	LocalLog() << "Solver: " << testSolverName << endl;
 	SolverFactory testSolverFactory(dirty, psf, IMAGE_DIM, testModel, testResidual);
 	hogbom = testSolverFactory.getSolver(testSolverName);
-	//timer = NewTimerHostOnly();
-	t0 = omp_get_wtime();
+	timer = NewTimerHostOnly();
 	hogbom->deconvolve();
-	t1 = omp_get_wtime();
-	auto runtimeTest = t1 - t0;
-	//runtimeTest = timer.get() * 1e-6;
+	runtimeTest = timer.get() * 1e-6;
+	LogTimeTaken(timer);
 
-	//LocalLog() << "Verifying model..." << endl;
-	cout << "Verifying model..." << endl;
+	LocalLog() << "Verifying model..." << endl;
 	maximumError.maxError(refModel, testModel);
 	
-	//LocalLog() << "Verifying residual..." << endl;
-	cout << "Verifying residual..." << endl;
+	LocalLog() << "Verifying residual..." << endl;
 	maximumError.maxError(refResidual, testResidual);
 
-	//LocalLog() << "RUNTIME IN SECONDS:" << endl;
-	cout << "RUNTIME IN SECONDS:" << endl;
-	//LocalLog() << left << setw(21) << refSolverName
-	//	<< left << setw(21) << testSolverName
-	//	<< left << setw(21) << "Speedup" << endl;
-	cout << left << setw(21) << refSolverName
+	LocalLog() << "RUNTIME IN SECONDS:" << endl;
+	LocalLog() << left << setw(21) << refSolverName
 		<< left << setw(21) << testSolverName
 		<< left << setw(21) << "Speedup" << endl;
 
-	cout << setprecision(2) << fixed;
-	//LocalLog() << left << setw(21) << runtimeRef
-		//<< left << setw(21) << runtimeTest
-		//<< left << setw(21) << runtimeRef / runtimeTest << endl;
-	cout << left << setw(21) << runtimeRef
+	LocalLog() << left << setw(21) << runtimeRef
 		<< left << setw(21) << runtimeTest
-		<< left << setw(21) << runtimeRef / runtimeTest << endl;	
+		<< left << setw(21) << runtimeRef / runtimeTest << endl;
 	/*
 	// Write images out
 	imagProc.writeImage("residual.img", refResidual);

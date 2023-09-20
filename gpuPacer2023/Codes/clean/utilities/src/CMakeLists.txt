@@ -2,10 +2,10 @@
 add_library (UtilitiesCMake 
     ImageProcess.cpp 
     MaxError.cpp 
-    #MemUtil.cpp 
-    #ThreadAffinityUtil.cpp 
-    #TimeUtil.cpp 
+    MemUtil.cpp 
+    ThreadAffinityUtil.cpp 
+    TimeUtil.cpp 
     WarmupGPU.hip
     WarmupGPU.cu
-    Hello.cpp
+    #Hello.cpp
     )
