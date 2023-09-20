@@ -4,10 +4,10 @@ add_library (UtilitiesCMake
     RandomVectorGenerator.cpp
     Setup.cpp 
     MaxError.cpp 
-    MemUtil.cpp 
-    ThreadAffinityUtil.cpp 
-    TimeUtil.cpp 
+    #MemUtil.cpp 
+    #ThreadAffinityUtil.cpp 
+    #TimeUtil.cpp 
     WarmupGPU.hip
-    WarmupGPU.cu
+    #WarmupGPU.cu
     Hello.cpp
     )

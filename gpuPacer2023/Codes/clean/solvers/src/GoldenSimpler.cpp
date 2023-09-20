@@ -41,20 +41,6 @@ void GoldenSimpler::subtractPSF(const size_t peakPos,
 
 	const int stopx = min(imageWidth - 1, rx + (imageWidth - px - 1));
 	const int stopy = min(imageWidth - 1, ry + (imageWidth - py - 1));
-/*
-    cout << "rx = " << rx << endl;
-    cout << "ry = " << ry << endl;
-    cout << "px = " << px << endl;
-    cout << "py = " << py << endl;
-    cout << "diffx = " << diffx << endl;
-    cout << "diffy = " << diffy << endl;
-    cout << "startx = " << startx << endl;
-    cout << "starty = " << starty << endl;
-    cout << "stopx = " << stopx << endl;
-    cout << "stopy = " << stopy << endl;
-    cout << "stopx - startx = " << stopx - startx << endl;
-    cout << "stopy - starty = " << stopy - starty << endl;
-*/
 
 	for (int y = starty; y <= stopy; ++y)
 	{

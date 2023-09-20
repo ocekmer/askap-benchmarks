@@ -26,11 +26,13 @@ void MaxError<complex<float>>::maxError(const Vector<complex<float>>& v1, const 
                 maximumErrorImag = abs(v1[i].imag() - v2[i].imag());
                 maximumErrorReal = abs(v1[i].real() - v2[i].real());
                 index = i;
-                LocalLog() << "Maximum Error: (" << maximumErrorReal << ", " << maximumErrorImag << "), at index: " << index << endl;
+                //LocalLog() << "Maximum Error: (" << maximumErrorReal << ", " << maximumErrorImag << "), at index: " << index << endl;
+                cout << "Maximum Error: (" << maximumErrorReal << ", " << maximumErrorImag << "), at index: " << index << endl;
 //                exit(-1);
             }
         }
-        LocalLog() << "Maximum Error: (" << maximumErrorReal << ", " << maximumErrorImag << ")" << endl;
+        //LocalLog() << "Maximum Error: (" << maximumErrorReal << ", " << maximumErrorImag << ")" << endl;
+        cout << "Maximum Error: (" << maximumErrorReal << ", " << maximumErrorImag << ")" << endl;
     }
 
     catch (int& ex)
@@ -59,11 +61,13 @@ void MaxError<complex<double>>::maxError(const Vector<complex<double>>& v1, cons
                 maximumErrorImag = abs(v1[i].imag() - v2[i].imag());
                 maximumErrorReal = abs(v1[i].real() - v2[i].real());
                 index = i;
-                LocalLog() << "Maximum Error: (" << maximumErrorReal << ", " << maximumErrorImag << "), at index: " << index << endl;
+                //LocalLog() << "Maximum Error: (" << maximumErrorReal << ", " << maximumErrorImag << "), at index: " << index << endl;
+                cout << "Maximum Error: (" << maximumErrorReal << ", " << maximumErrorImag << "), at index: " << index << endl;
   //              exit(-1);
             }
         }
-        LocalLog() << "Maximum Error: (" << maximumErrorReal << ", " << maximumErrorImag << ")" << endl;
+        //LocalLog() << "Maximum Error: (" << maximumErrorReal << ", " << maximumErrorImag << ")" << endl;
+        cout << "Maximum Error: (" << maximumErrorReal << ", " << maximumErrorImag << ")" << endl;
     }
     catch (int& ex)
     {
@@ -91,7 +95,8 @@ void MaxError<T>::maxError(const Vector<T>& v1, const Vector<T>& v2) const
     {
         cerr << "Sizes of 2 vectors are different." << endl;
     }
-    LocalLog() << "Maximum Error: " << maximumError << endl;
+    //LocalLog() << "Maximum Error: " << maximumError << endl;
+    cout << "Maximum Error: " << maximumError << endl;
 }
 
 template void MaxError<float>::maxError(const Vector<float>& v1, const Vector<float>& v2) const;

@@ -53,7 +53,7 @@
 #include "solvers/factory/SolverFactory.h"
 #include "utilities/include/WarmupGPU.h"
 #include "utilities/include/WarmupSetup.h"
-#include "utilities/include/LoggerUtil.h"
+//#include "utilities/include/LoggerUtil.h"
 #include "utilities/include/MaxError.h"
 #include "utilities/include/PrintVector.h"
 #include "utilities/include/Setup.h"
@@ -78,6 +78,7 @@ using std::fixed;
 
 int main()
 {
+/*
     MPI_Init(&argc, &argv);
     int size;
     MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -92,12 +93,11 @@ int main()
     Hello hello(size, rank, name);
     hello.hello();   
 
-	
-
-
 	// report the parellelism and affinity
 	LogParallelAPI();
 	LogBinding();
+
+*/
     // Print vector object
     PrintVector<Value> printVectorComplex;
     PrintVector<Coord> printVector;
@@ -106,7 +106,8 @@ int main()
     MaxError<Value> maximumError;
 
     // Initialize the data to be gridded
-    auto timer = NewTimerHostOnly();
+    //auto timer = NewTimerHostOnly();
+	auto t0 = omp_get_wtime();
 
     vector<Coord> u(NSAMPLES, 0.0);
     vector<Coord> v(NSAMPLES, 0.0);
@@ -116,7 +117,9 @@ int main()
     Vector<Value> refData(NSAMPLES * NCHAN, 0.0);
     Vector<Value> testData(NSAMPLES * NCHAN, 0.0);
     
-    auto timeInitData = timer.get() * 1e-6;
+    //auto timeInitData = timer.get() * 1e-6;
+    auto t1 = omp_get_wtime();
+    auto timeInitData = t1 - t0;
 
     // Measure frequency in inverse wavelengths
     vector<Coord> freq(NCHAN, 0.0);
@@ -134,10 +137,13 @@ int main()
 
     Setup<Real, Coord, Value> setup(support, overSample, wCellSize, u, v, w, freq, cOffset, iu, iv, C);
     
-    timer = NewTimerHostOnly();
+    //timer = NewTimerHostOnly();
+    t0 = omp_get_wtime();
     setup.setup();
-    auto timeSetup = timer.get() * 1e-6;
-
+    //auto timeSetup = timer.get() * 1e-6;
+    t1 = omp_get_wtime();
+    auto timeSetup = t1 - t0;
+    
     const size_t SSIZE = 2 * support + 1;
     const size_t DSIZE = NSAMPLES * NCHAN;
     Vector<Value> grid(GSIZE * GSIZE);
@@ -153,12 +159,17 @@ int main()
     }
    
     // Reference degridder
-    LocalLog() << "Solver: " << refSolverName << endl;
+    //LocalLog() << "Solver: " << refSolverName << endl;
+    cout << "Solver: " << refSolverName << endl;
     SolverFactory<Value> refSolverFactory(grid, DSIZE, SSIZE, GSIZE, support, C, cOffset, iu, iv, refData);
     std::shared_ptr<IDegridder<Value>> refGridder = refSolverFactory.getSolver(refSolverName);
-    timer = NewTimerHostOnly();
+    //timer = NewTimerHostOnly();
+    t0 = omp_get_wtime();
     refGridder->degridder();
-    auto timeDegridRef = timer.get() * 1e-6;
+    t1 = omp_get_wtime();
+    auto timeDegridRef = t1 - t0;
+
+    //auto timeDegridRef = timer.get() * 1e-6;
 
     // WARMUP
 	if ((!refGPU) && testGPU)
@@ -168,29 +179,37 @@ int main()
     }
 
     // Test gridder
-    LocalLog() << "Solver: " << testSolverName << endl;
+    //LocalLog() << "Solver: " << testSolverName << endl;
+    cout << "Solver: " << testSolverName << endl;
     SolverFactory<Value> testSolverFactory(grid, DSIZE, SSIZE, GSIZE, support, C, cOffset, iu, iv, testData);
     std::shared_ptr<IDegridder<Value>> testGridder = testSolverFactory.getSolver(testSolverName);
-    timer = NewTimerHostOnly();
+    //timer = NewTimerHostOnly();
+    t0 = omp_get_wtime();
     testGridder->degridder();
-    auto timeDegridTest = timer.get() * 1e-6;
-    
-    LocalLog() << "Verifying the code" << endl;
+    //auto timeDegridTest = timer.get() * 1e-6;
+    t1 = omp_get_wtime();
+    auto timeDegridTest = t1 - t0;
+
+    //LocalLog() << "Verifying the code" << endl;
+    cout << "Verifying the code" << endl;
     maximumError.maxError(refData, testData);
 
-    LocalLog() << "RUNTIME IN SECONDS" << endl;
-    LocalLog() << left << setw(21) << "Setup"
+    //LocalLog() << "RUNTIME IN SECONDS" << endl;
+    cout << "RUNTIME IN SECONDS" << endl;
+    //LocalLog() << left << setw(21) << "Setup"
+    cout << left << setw(21) << "Setup"
         << left << setw(21) << "Degridding - Ref"
         << left << setw(21) << "Degridding - Test"
         << left << setw(21) << "Speedup" << endl;;
 
     cout << setprecision(2) << fixed;
-    LocalLog() << left << setw(21) << timeSetup
+    //LocalLog() << left << setw(21) << timeSetup
+    cout << left << setw(21) << timeSetup
         << left << setw(21) << timeDegridRef
         << left << setw(21) << timeDegridTest 
         << left << setw(21) << timeDegridRef/timeDegridTest << endl;
 
-    MPI_Finalize();
+    //MPI_Finalize();
 	
 }
 

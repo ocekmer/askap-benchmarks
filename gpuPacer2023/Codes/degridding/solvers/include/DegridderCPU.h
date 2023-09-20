@@ -2,7 +2,7 @@
 
 #include "../interface/IDegridder.h"
 
-#include "../../utilities/include/LoggerUtil.h"
+//#include "../../utilities/include/LoggerUtil.h"
 
 #include <vector>
 #include <iostream>

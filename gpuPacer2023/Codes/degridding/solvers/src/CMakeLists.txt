@@ -6,10 +6,10 @@ add_library (SourceCodeCMake
     DegridderGPUSequential.hip 
     DegridderGPUInterleaved.hip 
     DegridderGPUWarpShuffle.hip
-    DegridderGPUTiled.cu
-    DegridderGPULessIdle.cu 
-    DegridderGPUSequential.cu 
-    DegridderGPUInterleaved.cu 
-    DegridderGPUWarpShuffle.cu 
-    DegridderGPUTiled.cu
+    #DegridderGPUTiled.cu
+    #DegridderGPULessIdle.cu 
+    #DegridderGPUSequential.cu 
+    #DegridderGPUInterleaved.cu 
+    #DegridderGPUWarpShuffle.cu 
+    #DegridderGPUTiled.cu
     )

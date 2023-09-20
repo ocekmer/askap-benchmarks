@@ -1,6 +1,5 @@
 #include "../include/DegridderCPU.h"
 
-
 using std::cout;
 using std::endl;
 using std::vector;
@@ -8,9 +7,11 @@ using std::vector;
 template <typename T2>
 void DegridderCPU<T2>::degridder()
 {
-    LocalLog() << "Degridding on CPU" << endl;
+    //LocalLog() << "Degridding on CPU" << endl;
+    cout << "Degridding on CPU" << endl;
     const int SSIZE = 2 * this->support + 1;
-    LocalLog() << "SSIZE = " << SSIZE << endl;
+    //LocalLog() << "SSIZE = " << SSIZE << endl;
+    cout << "SSIZE = " << SSIZE << endl;
     for (int dind = 0; dind < this->DSIZE; ++dind)
     {
         this->data[dind] = 0.0;

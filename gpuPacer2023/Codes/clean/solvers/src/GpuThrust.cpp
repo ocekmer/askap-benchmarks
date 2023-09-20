@@ -13,7 +13,7 @@ void GpuThrust::findPeak(const vector<float>& image, float& maxVal, size_t& maxP
 	maxPos = 0;
 	const size_t SIZE = image.size();
 
-    float *result = thrust::max_element(thrust::host, image.data(), image.data() + SIZE);
+    auto *result = thrust::max_element(thrust::host, image.data(), image.data() + SIZE);
     maxVal = *result;
     maxPos = result;
 

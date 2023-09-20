@@ -159,7 +159,8 @@ __host__
 void GpuSimpler::subtractPSF2(const int &px, const int &py, const size_t &peakPos,
     const float &absPeakVal)
 {
-    const int blockDim = 16;
+
+    const int blockDim = 32;
 
     const int rx = peakPos % imageWidth;
     const int ry = peakPos / imageWidth;
@@ -241,12 +242,17 @@ void GpuSimpler::deconvolve()
                 << peakPos / imageWidth << ", index = " << peakPos << endl;
         }
 
+        
+
         // Check if threshold has been reached
         if (abs(peakVal) < gThreshold)
         {
             cout << "Reached stopping threshold" << endl;
             break;
         }
+
+        // Carry this one here, copy the if condition below into subtractPSF2
+        //subtractPSF2(px, py, peakPos, peakVal);
 
         // Subtract the PSF from the residual image
         // This function will launch a kernel
