@@ -24,6 +24,7 @@
 
 #if defined(USEHIP)
 #define gpuMalloc hipMalloc
+//#define gpuHostMalloc hipHostMalloc
 #define gpuHostMalloc hipHostMalloc
 #define gpuFree hipFree
 #define gpuMemcpy hipMemcpy

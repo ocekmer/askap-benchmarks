@@ -21,7 +21,7 @@ public:
     auto allocate(size_type n, const void* = 0) -> value_type*
     {
         value_type* tmp;
-        auto error = gpuMallocHost((void**)&tmp, n * sizeof(T));
+        auto error = gpuHostMalloc((void**)&tmp, n * sizeof(T));
         //auto error = cudaHostAlloc((void**)&tmp, n * sizeof(T), cudaHostAllocDefault);
         //auto error = cudaHostAlloc((void**)&tmp, n * sizeof(T), cudaHostAllocMapped);
         //auto error = cudaHostAlloc((void**)&tmp, n * sizeof(T), cudaHostAllocPortable);
