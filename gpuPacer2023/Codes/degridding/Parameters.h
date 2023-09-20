@@ -24,7 +24,7 @@ typedef std::complex<Real> Value;    // T2
 // Host memory type
 template <typename T>
 using Vector = std::vector<T>; // PAGEABLE
-// using Vector = pinnedVector<T>;  // PINNED
+//using Vector = pinnedVector<T>;  // PINNED
 
 // Can be changed for testing purposes
 //const int NSAMPLES = 1<<27; //(134 M)
@@ -41,7 +41,7 @@ const Coord CELLSIZE = 5.0;
 const int BASELINE = 2000;
 
 // Solver selection
-static const std::string refSolverName = "gpuWarpShuffle";
+static const std::string refSolverName = "gpuTiled";
 static const std::string testSolverName = "gpuTiled";
 
 /*

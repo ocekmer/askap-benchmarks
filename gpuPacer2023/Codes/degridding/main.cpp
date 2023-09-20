@@ -151,12 +151,12 @@ int main()
 
     // WARMUP
 	WarmupGPU warmupGPU;
-    warmupSetup();
-    if (refGPU)
-    {
-        warmupGPU.warmup();
-        cout << "Warmup for reference solver: " << refSolverName << endl;
-    }
+    //warmupSetup();
+  //  if (refGPU)
+   // {
+        //warmupGPU.warmup();
+        //cout << "Warmup for reference solver: " << refSolverName << endl;
+   // }
    
     // Reference degridder
     //LocalLog() << "Solver: " << refSolverName << endl;
@@ -172,12 +172,12 @@ int main()
     //auto timeDegridRef = timer.get() * 1e-6;
 
     // WARMUP
-	if ((!refGPU) && testGPU)
-    {
-        warmupGPU.warmup();
-        cout << "Warmup for test solver: " << testSolverName << endl;
-    }
-
+//	if ((!refGPU) && testGPU)
+  //  {
+    //    warmupGPU.warmup();
+      //  cout << "Warmup for test solver: " << testSolverName << endl;
+   // }
+/*
     // Test gridder
     //LocalLog() << "Solver: " << testSolverName << endl;
     cout << "Solver: " << testSolverName << endl;
@@ -193,22 +193,22 @@ int main()
     //LocalLog() << "Verifying the code" << endl;
     cout << "Verifying the code" << endl;
     maximumError.maxError(refData, testData);
-
+*/
     //LocalLog() << "RUNTIME IN SECONDS" << endl;
     cout << "RUNTIME IN SECONDS" << endl;
     //LocalLog() << left << setw(21) << "Setup"
     cout << left << setw(21) << "Setup"
         << left << setw(21) << "Degridding - Ref"
-        << left << setw(21) << "Degridding - Test"
-        << left << setw(21) << "Speedup" << endl;;
-
+  //      << left << setw(21) << "Degridding - Test"
+    //    << left << setw(21) << "Speedup" << endl;;
+	 << endl;
     cout << setprecision(2) << fixed;
     //LocalLog() << left << setw(21) << timeSetup
     cout << left << setw(21) << timeSetup
         << left << setw(21) << timeDegridRef
-        << left << setw(21) << timeDegridTest 
-        << left << setw(21) << timeDegridRef/timeDegridTest << endl;
-
+     //   << left << setw(21) << timeDegridTest 
+      //  << left << setw(21) << timeDegridRef/timeDegridTest << endl;
+	<< endl;
     //MPI_Finalize();
 	
 }

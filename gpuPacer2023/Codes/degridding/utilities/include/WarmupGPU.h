@@ -4,6 +4,7 @@
 #include "MaxError.h"
 #include "GpuCommon.h"
 //#include "LoggerUtil.h"
+#include "../../Parameters.h""
 
 // Standard libs
 #include <vector>

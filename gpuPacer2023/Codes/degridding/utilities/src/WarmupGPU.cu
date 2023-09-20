@@ -19,10 +19,10 @@ void vectorAdd(const float* a, const float* b, float* c, const size_t N)
 
 void WarmupGPU::warmup() const
 {
-	vector<float> a(N, 1.0);
-	vector<float> b(N, 2.0);
-	vector<float> c(N, 0.0);
-	vector<float> cAnswer(N, 3.0);
+	Vector<float> a(N, 1.0);
+	Vector<float> b(N, 2.0);
+	Vector<float> c(N, 0.0);
+	Vector<float> cAnswer(N, 3.0);
 
 	const size_t SIZE = N * sizeof(float);
 

@@ -52,7 +52,7 @@ find_package(OpenMP REQUIRED)
 if(OpenMP_CXX_FOUND)
     message(STATUS "OpenMP found")
     target_link_libraries(askap PUBLIC OpenMP::OpenMP_CXX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -O2")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -Rpass-analysis=kernel-resource-usage -O2")
 endif()
 
 #find_package(MPI REQUIRED)

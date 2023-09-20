@@ -27,6 +27,7 @@
 //#define gpuHostMalloc hipHostMalloc
 #define gpuHostMalloc hipHostMalloc
 #define gpuFree hipFree
+#define gpuFreeHost hipHostFree
 #define gpuMemcpy hipMemcpy
 #define gpuMemcpyHostToDevice hipMemcpyHostToDevice
 #define gpuMemcpyDeviceToHost hipMemcpyDeviceToHost
@@ -66,6 +67,7 @@ typedef hipComplex Complex;
 #elif defined(USECUDA)
 #define gpuMalloc cudaMalloc
 #define gpuHostMalloc cudaMallocHost
+#define gpuFreeHost cudaFreeHost
 #define gpuFree cudaFree
 #define gpuMemcpy cudaMemcpy
 #define gpuMemcpyHostToDevice cudaMemcpyHostToDevice
