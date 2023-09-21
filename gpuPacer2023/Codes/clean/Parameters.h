@@ -29,9 +29,8 @@ extern float gGain, gThreshold;
 static const int BLOCK_SIZE = 512, GRID_SIZE = 128;
 
 // Solver selection
-static const std::string refSolverName = "thrust";
-// static const std::string refSolverName = "cpu";
-static const std::string testSolverName = "gpuSimpler";
+extern std::string refSolverName;
+extern std::string testSolverName;
 
 /*
 	Solvers explanation:

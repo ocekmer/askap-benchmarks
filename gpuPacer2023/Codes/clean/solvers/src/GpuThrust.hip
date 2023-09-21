@@ -19,6 +19,19 @@ struct device_fabs
   }
 };
 
+
+struct device_subtractPSF
+{
+    const float a;
+
+    device_subtractPSF(float _a) : a(_a){};
+
+    __host__ __device__
+        float operator()(const float& x, const float& y) const {
+            return x-a*y;
+        }
+};
+
 void GpuThrust::findPeak(
 	thrust::device_vector<float> & image_D, 
 	float& maxVal, 
@@ -29,7 +42,17 @@ void GpuThrust::findPeak(
     maxVal = *result;
 }
 
-void GpuThrust::subtractPSF(const size_t peakPos,
+void GpuThrust::subtractPSF(
+	const size_t peakPos,
+	const size_t psfPeakPos,
+	const float absPeakVal) { LocalLog()<<"Not implemented, does nothing"<<endl;}
+
+void GpuThrust::subtractPSF(
+	thrust::device_vector<float> &residual_D, 
+	thrust::device_vector<float> &psf_D,
+	thrust::device_vector<size_t> &index1_D,
+	thrust::device_vector<size_t> &index2_D,
+	const size_t peakPos,
 	const size_t psfPeakPos,
 	const float absPeakVal)
 {
@@ -47,15 +70,39 @@ void GpuThrust::subtractPSF(const size_t peakPos,
 
 	const int stopx = min(imageWidth - 1, rx + (imageWidth - px - 1));
 	const int stopy = min(imageWidth - 1, ry + (imageWidth - py - 1));
+	const int nindex = (stopx-startx)*(stopy-starty);
+    const float a = -gGain*absPeakVal;
 
+	//lets move the information to the device
+	// #pragma omp parallel for collapse(2)
+	size_t counter = 0;
+	thrust::host_vector<size_t> index1(imageWidth*imageWidth), index2(imageWidth*imageWidth);
 	for (int y = starty; y <= stopy; ++y)
 	{
 		for (int x = startx; x <= stopx; ++x)
 		{
-            residual[y * imageWidth + x] -= gGain * absPeakVal
-				* psf[(y-diffy) * imageWidth + (x - diffx)];
+
+			index1[counter] = y*imageWidth +x;
+			index2[counter] = (y-diffy) * imageWidth + (x - diffx);
+			counter++;
 		}
 	}
+	//worry about access beyond nindex, but give it a try
+	thrust::copy(index1.begin(), index1.end(), index1_D.begin());
+	thrust::copy(index2.begin(), index2.end(), index2_D.begin());
+	auto first_residual = thrust::make_permutation_iterator(residual_D.begin(), index1_D.begin());
+	auto last_residual = thrust::make_permutation_iterator(residual_D.end(), index1_D.end());
+	auto first_psf = thrust::make_permutation_iterator(psf_D.begin(), index2_D.begin());
+	thrust::transform(first_residual, last_residual, first_psf, first_residual, device_subtractPSF(gGain*absPeakVal));
+
+	// for (int y = starty; y <= stopy; ++y)
+	// {
+	// 	for (int x = startx; x <= stopx; ++x)
+	// 	{
+    //         residual_D[y * imageWidth + x] -= gGain * absPeakVal
+	// 			* psf_D[(y-diffy) * imageWidth + (x - diffx)];
+	// 	}
+	// }
 }
 
 void GpuThrust::deconvolve()
@@ -66,9 +113,10 @@ void GpuThrust::deconvolve()
 	float psfPeakVal = 0.0;
 	size_t psfPeakPos = 0;
 	auto timer = NewTimer();
-	thrust::device_vector<float> image_D = dirty;
 	thrust::device_vector<float> psf_D = psf;
 	thrust::device_vector<float> residual_D = dirty;
+	thrust::device_vector<size_t> index1(dirty.size());
+	thrust::device_vector<size_t> index2(dirty.size());
 	LogTimeTakenOnDevice(timer);
 	findPeak(psf_D, psfPeakVal, psfPeakPos);
 
@@ -100,6 +148,7 @@ void GpuThrust::deconvolve()
 		model[absPeakPos] += absPeakVal * gGain;
 
 		// Subtract the PSF from the residual image 
-		subtractPSF(absPeakPos, psfPeakPos, absPeakVal);
+		subtractPSF(residual_D, psf_D, index1, index2, absPeakPos, psfPeakPos, absPeakVal);
 	}
+	thrust::copy(residual_D.begin(), residual_D.end(), residual.begin());
 }

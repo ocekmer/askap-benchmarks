@@ -16,11 +16,12 @@ size_t gNiters = 10;
 float gGain = 0.1;
 float gThreshold = 0.00001;
 
+std::string refSolverName = "thrust";
+std::string testSolverName = "gpuSimpler";
+
 // int BLOCK_SIZE = 512, GRID_SIZE = 128;
 
 // Solver selection
-// std::string refSolverName = "thrust";
-// std::string testSolverName = "gpuSimpler";
 
 #include "utilities/include/ImageProcess.h"
 #include "utilities/include/MaxError.h"
@@ -81,6 +82,12 @@ int main(int argc, char *argv[])
 	if (argc >= 3) {
 		gNiters = atoi(argv[2]);
 	}
+	if (argc >= 4) {
+		refSolverName = std::string(argv[3]);
+	}
+	if (argc >= 5) {
+		testSolverName = std::string(argv[4]);
+	}
 	int dgrid = std::sqrt(dirty.size());
 	vector<float> newdirty(dirty.size()*ntile*ntile);
 	vector<float> newpsf(newdirty.size());
@@ -136,7 +143,8 @@ int main(int argc, char *argv[])
 	std::shared_ptr<IHogbom> hogbom = refSolverFactory.getSolver(refSolverName);
 	timer = NewTimerHostOnly();
 	hogbom->deconvolve();
-	runtimeRef = timer.get() * 1e-6;
+	runtimeRef = timer.get();
+	runtimeRef /= gNiters;
 	LogTimeTaken(timer);
 	
 	// WARMUP
@@ -147,6 +155,7 @@ int main(int argc, char *argv[])
     }
 
 	// NEW SOLVER TEST
+	gNiters = 1000;
 	vector<float> testResidual(dirty.size(), 0.0);
 	vector<float> testModel(dirty.size(), 0.0);
 	float runtimeTest = 0.0;
@@ -155,7 +164,8 @@ int main(int argc, char *argv[])
 	hogbom = testSolverFactory.getSolver(testSolverName);
 	timer = NewTimerHostOnly();
 	hogbom->deconvolve();
-	runtimeTest = timer.get() * 1e-6;
+	runtimeTest = timer.get();
+	runtimeTest /= gNiters;
 	LogTimeTaken(timer);
 
 	LocalLog() << "Verifying model..." << endl;
@@ -169,8 +179,8 @@ int main(int argc, char *argv[])
 		<< left << setw(21) << testSolverName
 		<< left << setw(21) << "Speedup" << endl;
 
-	LocalLog() << left << setw(21) << runtimeRef
-		<< left << setw(21) << runtimeTest
+	LocalLog() << left << setw(21) << runtimeRef*1e-6
+		<< left << setw(21) << runtimeTest*1e-6
 		<< left << setw(21) << runtimeRef / runtimeTest << endl;
 	/*
 	// Write images out

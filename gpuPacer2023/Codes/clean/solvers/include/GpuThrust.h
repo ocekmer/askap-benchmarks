@@ -27,6 +27,14 @@ private:
 		const size_t peakPos,
 		const size_t psfPeakPos,
 		const float absPeakVal) override;
+	void subtractPSF(
+		thrust::device_vector<float> &residual, 
+		thrust::device_vector<float> &psf, 
+		thrust::device_vector<size_t> &index1, 
+		thrust::device_vector<size_t> &index2, 
+		const size_t peakPos,
+		const size_t psfPeakPos,
+		const float absPeakVal);
 
 public:
 	GpuThrust(

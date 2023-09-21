@@ -146,27 +146,28 @@ namespace logger_util {
         std::basic_ostream<T> &operator<<(std::basic_ostream<T> &os, const detail::_microseconds_amount &t)
         {
             auto time = t._val;
+            float ftime;
             if (time < 1000) {
                 os << time << " [us]";
                 return os;
             }
-
+            ftime = time / 1000.f;
             time /= 1000;
             if (time < 1000) {
-                os << time << " [ms]";
+                os << ftime << " [ms]";
                 return os;
             }
 
-            float ftime = time / 1000.f;
+            ftime = time / 1000.f;
             const char *prefix = " [s]";
             if (ftime > 60) {
-                ftime /= 60;
+                ftime /= 60.f;
                 prefix = " [min]";
                 if (ftime > 60) {
-                    ftime /= 60;
+                    ftime /= 60.f;
                     prefix = " [h]";
                     if (ftime > 24) {
-                        ftime /= 24;
+                        ftime /= 24.f;
                         prefix = " [d]";
                     }
                 }
